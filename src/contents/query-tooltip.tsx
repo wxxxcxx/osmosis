@@ -9,7 +9,7 @@ import { createRoot } from 'react-dom/client'
 
 import { sendToBackground } from '@plasmohq/messaging'
 
-import { isEnglishWord } from '~utils'
+import { isEnglishWord } from '~utils/word'
 
 import { clsx } from "clsx"
 import { useSettings } from "../utils/settings"

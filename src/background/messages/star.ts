@@ -3,7 +3,7 @@ import { func } from 'prop-types'
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 import { Storage } from '@plasmohq/storage'
 
-import * as utils from '../../utils'
+import * as utils from '../../utils/word'
 
 interface WordItem {
   timespan: number
