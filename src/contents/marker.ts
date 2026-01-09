@@ -160,6 +160,7 @@ class NodeRender {
                 // 存储单词的 key（小写）和原始文本
                 xWordNode.dataset.key = wordNode.textContent.toLowerCase().trim()
                 xWordNode.dataset.text = wordNode.textContent
+                xWordNode.dataset.id = crypto.randomUUID()
                 xWordNode.style.position = 'relative'
                 xWordNode.innerText = wordNode.textContent
 

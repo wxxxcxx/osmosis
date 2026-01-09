@@ -4,7 +4,7 @@ import { OSMOSIS_STARRED_WORD_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
 import styleText from 'data-text:../globals.css'
 import { useSettings } from "~utils/settings";
 import { sendToBackground } from "@plasmohq/messaging";
-import React, { useEffect, useLayoutEffect, useRef, useState, type FC } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, type FC } from "react";
 import { clsx } from "clsx";
 import WordCard from "~components/description";
 import { useTheme } from "~utils/theme";
@@ -43,10 +43,10 @@ function getSelection() {
         document.body.appendChild(element)
     }
     element.style.pointerEvents = 'none'
-    element.style.position = 'fixed'
+    element.style.position = 'absolute'
     element.style.display = 'block'
-    element.style.top = rect.top + 'px'
-    element.style.left = rect.left + 'px'
+    element.style.top = (rect.top + window.scrollY) + 'px'
+    element.style.left = (rect.left + window.scrollX) + 'px'
     element.style.width = rect.width + 'px'
     element.style.height = rect.height + 'px'
     element.style.backgroundColor = 'transparent'
@@ -70,25 +70,42 @@ export const watchOverlayAnchor: PlasmoWatchOverlayAnchor = (
     updatePosition
 ) => {
     let timer: any
-    const debounceUpdatePosition = () => {
+    const debounceUpdatePosition = (delay: number = 100) => {
         clearTimeout(timer)
-        timer = setTimeout(updatePosition, 500)
+        timer = setTimeout(updatePosition, delay)
     }
 
-    window.addEventListener('resize', debounceUpdatePosition)
-    window.addEventListener('scroll', debounceUpdatePosition)
-    window.addEventListener('mouseup', debounceUpdatePosition)
+    // 立即更新位置（用于鼠标在 starred 单词间移动时）
+    const immediateUpdatePosition = () => {
+        clearTimeout(timer)
+        updatePosition()
+    }
+
+    // 监听 starred 单词上的 mouseover 事件，实现快速切换
+    const handleMouseOver = (e: MouseEvent) => {
+        const target = e.target as HTMLElement
+        if (target.tagName?.toUpperCase() === OSMOSIS_STARRED_WORD_TAG) {
+            // 鼠标移入 starred 单词时立即更新位置
+            immediateUpdatePosition()
+        }
+    }
+
+    window.addEventListener('resize', () => debounceUpdatePosition(100))
+    window.addEventListener('scroll', () => debounceUpdatePosition(100))
+    window.addEventListener('mouseup', () => debounceUpdatePosition(100))
+    document.addEventListener('mouseover', handleMouseOver)
 
     const interval = setInterval(() => {
-        debounceUpdatePosition()
+        debounceUpdatePosition(500)
     }, 1000)
 
     // Clear the interval when unmounted
     return () => {
         clearInterval(interval)
-        window.removeEventListener('resize', debounceUpdatePosition)
-        window.removeEventListener('scroll', debounceUpdatePosition)
-        window.removeEventListener('mouseup', debounceUpdatePosition)
+        window.removeEventListener('resize', () => debounceUpdatePosition(100))
+        window.removeEventListener('scroll', () => debounceUpdatePosition(100))
+        window.removeEventListener('mouseup', () => debounceUpdatePosition(100))
+        document.removeEventListener('mouseover', handleMouseOver)
     }
 }
 
@@ -164,7 +181,6 @@ function calculatePosition(anchorRect: DOMRect, tooltipWidth: number, tooltipHei
 
 // Overlay组件通过PlasmoCSUIProps接收anchor
 const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
-    const anchorElement = anchor.element as HTMLElement
     const isDarkTheme = useTheme()
     const [settings] = useSettings()
     const [wordData, setWordData] = useState<{
@@ -178,12 +194,24 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
     const [offset, setOffset] = useState({ x: 0, y: 0 })
     const tooltipRef = useRef<HTMLDivElement>(null)
 
+    // 动态获取当前的 anchor 元素
+    const anchorElement = useMemo(() => {
+        // 优先使用 selection
+        const selection = document.querySelector('osmosis-selection') as HTMLElement
+        if (selection) return selection
+        // 其次使用带有 TOOLTIP_SHOW_CLASS 的 starred 单词
+        const starredWord = document.querySelector(`${OSMOSIS_STARRED_WORD_TAG.toLowerCase()}.${TOOLTIP_SHOW_CLASS}`) as HTMLElement
+        if (starredWord) return starredWord
+        // 最后回退到 Plasmo 提供的 anchor
+        return anchor.element as HTMLElement
+    }, [anchor.element])
+
     // 判断anchor是否为选区元素
-    const isSelection = anchorElement.tagName.toLowerCase() === 'osmosis-selection'
+    const isSelection = anchorElement?.tagName?.toLowerCase() === 'osmosis-selection'
 
     // 从anchor元素获取data-key和data-text
-    const dataKey = anchorElement.dataset.key || ''
-    const dataText = anchorElement.dataset.text || ''
+    const dataKey = anchorElement?.dataset?.key || ''
+    const dataText = anchorElement?.dataset?.text || ''
 
     // 获取单词数据
     useEffect(() => {
@@ -215,7 +243,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
 
     // 计算位置
     useLayoutEffect(() => {
-        if (!tooltipRef.current) return
+        if (!tooltipRef.current || !anchorElement) return
 
         const anchorRect = anchorElement.getBoundingClientRect()
         const tooltipRect = tooltipRef.current.getBoundingClientRect()
@@ -232,41 +260,43 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
 
     if (!settings || !dataKey) return null
 
-    // 位置样式
+    // 位置样式 - 使用 absolute 定位，相对于 anchor 元素计算偏移
     const getPositionStyles = (): React.CSSProperties | undefined => {
         const anchorRect = anchorElement.getBoundingClientRect()
         const baseStyles: React.CSSProperties = {
-            position: 'fixed',
+            position: 'absolute',
             zIndex: 2147483647,
         }
+
+        const gap = 8 // tooltip 与 anchor 之间的间距
 
         switch (position) {
             case 'top':
                 return {
                     ...baseStyles,
-                    bottom: `${window.innerHeight - anchorRect.top + 8}px`,
-                    left: `${anchorRect.left + anchorRect.width / 2 + offset.x}px`,
+                    bottom: `${anchorRect.height + gap}px`,
+                    left: `calc(50% + ${offset.x}px)`,
                     transform: 'translateX(-50%)',
                 }
             case 'bottom':
                 return {
                     ...baseStyles,
-                    top: `${anchorRect.bottom + 8}px`,
-                    left: `${anchorRect.left + anchorRect.width / 2 + offset.x}px`,
+                    top: `${anchorRect.height + gap}px`,
+                    left: `calc(50% + ${offset.x}px)`,
                     transform: 'translateX(-50%)',
                 }
             case 'left':
                 return {
                     ...baseStyles,
-                    right: `${window.innerWidth - anchorRect.left + 8}px`,
-                    top: `${anchorRect.top + anchorRect.height / 2 + offset.y}px`,
+                    right: `${anchorRect.width + gap}px`,
+                    top: `calc(50% + ${offset.y}px)`,
                     transform: 'translateY(-50%)',
                 }
             case 'right':
                 return {
                     ...baseStyles,
-                    left: `${anchorRect.right + 8}px`,
-                    top: `${anchorRect.top + anchorRect.height / 2 + offset.y}px`,
+                    left: `${anchorRect.width + gap}px`,
+                    top: `calc(50% + ${offset.y}px)`,
                     transform: 'translateY(-50%)',
                 }
             default:
@@ -282,6 +312,8 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
             height: 0,
         }
 
+        // 箭头需要指向 anchor 中心
+        // 由于 tooltip 可能因边界检测而有 offset 偏移，箭头需要反向偏移来补偿
         switch (position) {
             case 'top':
                 return {
@@ -291,7 +323,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
                     transform: 'translateX(-50%)',
                     borderLeft: '6px solid transparent',
                     borderRight: '6px solid transparent',
-                    borderTop: '6px solid var(--color-surface)',
+                    borderTop: '6px solid var(--color-bg-surface)',
                 }
             case 'bottom':
                 return {
@@ -301,7 +333,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
                     transform: 'translateX(-50%)',
                     borderLeft: '6px solid transparent',
                     borderRight: '6px solid transparent',
-                    borderBottom: '6px solid var(--color-surface)',
+                    borderBottom: '6px solid var(--color-bg-surface)',
                 }
             case 'left':
                 return {
@@ -311,7 +343,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
                     transform: 'translateY(-50%)',
                     borderTop: '6px solid transparent',
                     borderBottom: '6px solid transparent',
-                    borderLeft: '6px solid var(--color-surface)',
+                    borderLeft: '6px solid var(--color-bg-surface)',
                 }
             case 'right':
                 return {
@@ -321,7 +353,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
                     transform: 'translateY(-50%)',
                     borderTop: '6px solid transparent',
                     borderBottom: '6px solid transparent',
-                    borderRight: '6px solid var(--color-surface)',
+                    borderRight: '6px solid var(--color-bg-surface)',
                 }
             default:
                 return baseStyles
@@ -353,7 +385,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
     }
 
     return (
-        <div className={clsx("theme-root", { "dark": isDarkTheme })}>
+        <div className={clsx("theme-root", { "dark": isDarkTheme })} style={{ position: 'relative', width: '100%', height: '100%' }}>
             <style>{styleText}</style>
             <AnimatePresence>
                 <motion.div
