@@ -11,8 +11,8 @@ import { sendToBackground } from '@plasmohq/messaging'
 
 import { clsx } from 'clsx'
 import { useSettings } from '../utils/settings'
-import WordCard from '../components/word-card'
-import WordLabel from '../components/word-label'
+import WordCard from '../components/description'
+import Highlight from '../components/highlight'
 import Tooltip from '../components/ui/tooltip'
 import api from './renderer'
 
@@ -52,7 +52,7 @@ function StarTooltip(props: any) {
       <Tooltip
         trigger={
           <span>
-            <WordLabel text={props.text} data={props.data}></WordLabel>
+            <Highlight text={props.text} data={props.data}></Highlight>
           </span>
         }
         className="tooltip"

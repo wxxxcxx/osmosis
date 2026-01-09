@@ -13,7 +13,7 @@ import { isEnglishWord } from '~utils/word'
 
 import { clsx } from "clsx"
 import { useSettings } from "../utils/settings"
-import WordCard from '../components/word-card'
+import WordCard from '../components/description'
 import Tooltip from '../components/ui/tooltip'
 
 const querySelection = (e: MouseEvent) => {

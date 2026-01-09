@@ -1,5 +1,6 @@
 import type { PlasmoCSUIProps, PlasmoGetOverlayAnchor, PlasmoWatchOverlayAnchor } from "plasmo";
 import { isEnglishWord } from "~utils/word";
+import { OSMOSIS_STARRED_WORD_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
 import styleText from 'data-text:../globals.css'
 import { useSettings } from "~utils/settings";
 import { sendToBackground } from "@plasmohq/messaging";
@@ -12,16 +13,27 @@ import { AnimatePresence, motion } from "motion/react";
 
 function getSelection() {
     const selection = window.getSelection()
+
+    // 如果没有有效的选区，清理可能残留的osmosis-selection元素
     if (
         selection == null ||
         selection.toString().trim() == '' ||
         selection.rangeCount == 0
     ) {
+        const element = document.querySelector('osmosis-selection')
+        if (element) {
+            element.remove()
+        }
         return
     }
     const range = selection.getRangeAt(0)
     const text = range.toString().trim()
     if (text === '' || !isEnglishWord(text)) {
+        // 清理残留的osmosis-selection元素
+        const element = document.querySelector('osmosis-selection')
+        if (element) {
+            element.remove()
+        }
         return
     }
     const rect = range.getBoundingClientRect()
@@ -45,7 +57,7 @@ function getSelection() {
 }
 
 function getTargetElement() {
-    const target: HTMLElement | null = document.querySelector('osmosis-starred-word.show-tooltip')
+    const target: HTMLElement | null = document.querySelector(`${OSMOSIS_STARRED_WORD_TAG.toLowerCase()}.${TOOLTIP_SHOW_CLASS}`)
     return target
 }
 
@@ -165,6 +177,9 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
     const [position, setPosition] = useState<TooltipPosition>('bottom')
     const [offset, setOffset] = useState({ x: 0, y: 0 })
     const tooltipRef = useRef<HTMLDivElement>(null)
+
+    // 判断anchor是否为选区元素
+    const isSelection = anchorElement.tagName.toLowerCase() === 'osmosis-selection'
 
     // 从anchor元素获取data-key和data-text
     const dataKey = anchorElement.dataset.key || ''
@@ -344,6 +359,7 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
                 <motion.div
                     ref={tooltipRef}
                     className={clsx(
+                        "osmosis-tooltip-container",
                         "p-4 rounded-lg shadow-lg w-[300px]",
                         "bg-surface text-text-primary",
                         "pointer-events-auto"
@@ -360,6 +376,27 @@ const Overlay: FC<PlasmoCSUIProps> = ({ anchor }) => {
                     }}
                     onMouseUp={(e) => e.stopPropagation()}
                     onClick={(e) => e.stopPropagation()}
+                    onMouseEnter={() => {
+                        // 只对已star单词(非选区)处理鼠标移入事件
+                        if (!isSelection) {
+                            // 清除单词元素上的隐藏timeout
+                            const starredWord = document.querySelector(`${OSMOSIS_STARRED_WORD_TAG.toLowerCase()}.${TOOLTIP_SHOW_CLASS}`) as HTMLElement
+                            if (starredWord?.dataset.hideTimeoutId) {
+                                clearTimeout(Number(starredWord.dataset.hideTimeoutId))
+                                delete starredWord.dataset.hideTimeoutId
+                            }
+                        }
+                    }}
+                    onMouseLeave={() => {
+                        // 只对已star单词(非选区)的tooltip处理鼠标移出事件
+                        if (!isSelection) {
+                            // 移除单词的TOOLTIP_SHOW_CLASS，触发tooltip隐藏
+                            const starredWord = document.querySelector(`${OSMOSIS_STARRED_WORD_TAG.toLowerCase()}.${TOOLTIP_SHOW_CLASS}`)
+                            if (starredWord) {
+                                starredWord.classList.remove(TOOLTIP_SHOW_CLASS)
+                            }
+                        }
+                    }}
                 >
                     {loading ? (
                         <div className="flex items-center justify-center py-4">

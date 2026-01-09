@@ -223,19 +223,6 @@ const Tooltip: React.FC<TooltipProps> = ({
               "absolute z-50 p-5 rounded shadow-md w-[300px]",
               "bg-surface text-text-primary",
               "pointer-events-auto",
-              // remove transition-opacity since motion handles it
-              // remove the translate classes from CSS effectively?
-              // Actually, we can keep the positioning classes (top, left)
-              // But we should remove the transform classes (-translate-x-1/2) from tailwind
-              // OR let motion handle the transform entirely.
-              // Let's modify getPositionClasses to NOT include transforms, and rely on variants.
-              // See `getPositionClasses` below logic update.
-              // Re-check getPositionClasses:
-              //   case "top": "bottom-full left-1/2 -translate-x-1/2 mb-2"
-              //   The variants I defined above cover the x/y translation.
-              //   So I should probably STRIP the transform classes from `getPositionClasses` or rely on Motion to merge/override?
-              //   Motion usually overrides. To be safe, rely on variants for the alignment transform.
-              //   "left-1/2" sets left: 50%. Variant x: "-50%" centers it. Correct.
               getPositionClasses().replace(/-translate-[xy]-1\/2/g, '').trim()
             )}
             style={{

@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 
 import { sendToBackground } from '@plasmohq/messaging'
 
-import api from '~contents/renderer'
+import marker from '~contents/marker'
 
 interface WordCardProps {
   text: string
@@ -39,7 +39,7 @@ const WordCard: React.FC<WordCardProps> = ({ text, data }) => {
 
       setIsStarred(!isStarred)
       // Trigger re-render of highlights on the page
-      api.renderer.render()
+      marker.renderer.render()
     } catch (error) {
       console.error("Osmosis: Failed to toggle star", error)
     } finally {
