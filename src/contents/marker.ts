@@ -184,16 +184,16 @@ class NodeRender {
                     xWordNode.classList.add(TOOLTIP_SHOW_CLASS)
                 })
 
-                // 鼠标移出单词时，延迟隐藏tooltip
-                xWordNode.addEventListener('mouseleave', () => {
-                    // 延迟200ms后隐藏，给用户时间移入tooltip
-                    const timeoutId = setTimeout(() => {
-                        xWordNode.classList.remove(TOOLTIP_SHOW_CLASS)
-                        delete xWordNode.dataset.hideTimeoutId
-                    }, 200)
-                    // 将timeout ID存储在元素上，以便tooltip可以取消它
-                    xWordNode.dataset.hideTimeoutId = String(timeoutId)
-                })
+                // // 鼠标移出单词时，延迟隐藏tooltip
+                // xWordNode.addEventListener('mouseleave', () => {
+                //     // 延迟200ms后隐藏，给用户时间移入tooltip
+                //     const timeoutId = setTimeout(() => {
+                //         xWordNode.classList.remove(TOOLTIP_SHOW_CLASS)
+                //         delete xWordNode.dataset.hideTimeoutId
+                //     }, 200)
+                //     // 将timeout ID存储在元素上，以便tooltip可以取消它
+                //     xWordNode.dataset.hideTimeoutId = String(timeoutId)
+                // })
 
                 // 用锚点元素替换原来的文本节点
                 wordNode.parentNode?.replaceChild(xWordNode, wordNode)

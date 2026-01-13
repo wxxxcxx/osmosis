@@ -1,5 +1,5 @@
 import { sendToBackground } from "@plasmohq/messaging";
-import type { PlasmoCSUIJSXContainer, PlasmoGetInlineAnchorList, PlasmoRender } from "plasmo";
+import type { PlasmoCSUIJSXContainer, PlasmoGetInlineAnchorList, PlasmoGetShadowHostId, PlasmoRender } from "plasmo";
 import { createRoot } from "react-dom/client";
 import Highlight from "~components/highlight";
 import { OSMOSIS_STARRED_WORD_TAG } from "~utils/constants";
@@ -10,7 +10,6 @@ export default Highlight
 
 export const getInlineAnchorList: PlasmoGetInlineAnchorList = async () =>
     document.querySelectorAll(OSMOSIS_STARRED_WORD_TAG)
-
 
 export const getRootContainer = () => {
     return new Promise((resolve) => {
