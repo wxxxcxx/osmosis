@@ -166,34 +166,18 @@ class NodeRender {
 
                 // 鼠标移入单词时，显示tooltip
                 xWordNode.addEventListener('mouseenter', () => {
-                    // 清除可能存在的隐藏timeout
-                    if (xWordNode.dataset.hideTimeoutId) {
-                        clearTimeout(Number(xWordNode.dataset.hideTimeoutId))
-                        delete xWordNode.dataset.hideTimeoutId
-                    }
                     // 移除其他单词的tooltip显示状态
                     document.querySelectorAll(`${OSMOSIS_STARRED_WORD_TAG}.${TOOLTIP_SHOW_CLASS}`).forEach((item) => {
-                        // 清除其他单词的timeout
-                        if ((item as HTMLElement).dataset.hideTimeoutId) {
-                            clearTimeout(Number((item as HTMLElement).dataset.hideTimeoutId))
-                            delete (item as HTMLElement).dataset.hideTimeoutId
-                        }
                         item.classList.remove(TOOLTIP_SHOW_CLASS)
                     })
                     // 为当前单词添加tooltip显示状态
                     xWordNode.classList.add(TOOLTIP_SHOW_CLASS)
                 })
 
-                // // 鼠标移出单词时，延迟隐藏tooltip
-                // xWordNode.addEventListener('mouseleave', () => {
-                //     // 延迟200ms后隐藏，给用户时间移入tooltip
-                //     const timeoutId = setTimeout(() => {
-                //         xWordNode.classList.remove(TOOLTIP_SHOW_CLASS)
-                //         delete xWordNode.dataset.hideTimeoutId
-                //     }, 200)
-                //     // 将timeout ID存储在元素上，以便tooltip可以取消它
-                //     xWordNode.dataset.hideTimeoutId = String(timeoutId)
-                // })
+                // 鼠标移出单词时，隐藏tooltip
+                xWordNode.addEventListener('mouseleave', () => {
+                    xWordNode.classList.remove(TOOLTIP_SHOW_CLASS)
+                })
 
                 // 用锚点元素替换原来的文本节点
                 wordNode.parentNode?.replaceChild(xWordNode, wordNode)

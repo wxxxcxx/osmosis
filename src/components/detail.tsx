@@ -16,7 +16,7 @@ interface WordCardProps {
   }
 }
 
-const WordCard: React.FC<WordCardProps> = ({ text, data }) => {
+const Detail: React.FC<WordCardProps> = ({ text, data }) => {
   const [isStarred, setIsStarred] = useState(data.starred)
   const [loading, setLoading] = useState(false)
 
@@ -102,4 +102,4 @@ const WordCard: React.FC<WordCardProps> = ({ text, data }) => {
   )
 }
 
-export default WordCard
+export default Detail

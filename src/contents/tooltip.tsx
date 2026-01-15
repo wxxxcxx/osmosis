@@ -1,106 +1,113 @@
-import type { PlasmoGetOverlayAnchor, PlasmoWatchOverlayAnchor } from "plasmo";
-import { isEnglishWord } from "~utils/word";
-import { OSMOSIS_STARRED_WORD_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
+import { clsx } from "clsx";
+import styleText from 'data-text:../globals.css';
+import { AnimatePresence, motion } from "motion/react";
+import type { PlasmoGetOverlayAnchor } from "plasmo";
+import React from "react";
+import Detail from "~components/detail";
+import {
+    tooltipAnimationVariants,
+    useAnchorElement,
+    useTooltipPosition,
+    useWordData
+} from "~hooks";
+import { TOOLTIP_SHOW_CLASS } from "~utils/constants";
+import { useSettings } from "~utils/settings";
+import { useTheme } from "~utils/theme";
 
-// 导入提取的 Overlay 组件
-export { default } from "~components/tooltip-overlay";
+/**
+ * Tooltip 覆盖层组件
+ * 
+ * 用于在 starred 单词或选区上显示单词释义的 tooltip
+ */
+function TooltipOverlay() {
+    // 主题和设置
+    const isDarkTheme = useTheme()
+    const [settings] = useSettings()
 
+    // 获取 anchor 元素和相关数据
+    const { anchorElement, data, rect, isSelection } = useAnchorElement()
 
-function getSelection() {
-    const selection = window.getSelection()
+    // 获取单词数据
+    const { wordData, loading } = useWordData(data?.key)
 
-    // 如果没有有效的选区，清理可能残留的osmosis-selection元素
-    if (
-        selection == null ||
-        selection.toString().trim() == '' ||
-        selection.rangeCount == 0
-    ) {
-        const element = document.querySelector('osmosis-selection')
-        if (element) {
-            element.remove()
+    // 计算 tooltip 位置
+    const {
+        tooltipRef,
+        position,
+        getPositionStyles,
+        getArrowStyles
+    } = useTooltipPosition(rect, [wordData, loading])
+
+    // 不满足显示条件时返回 null
+    if (!settings || !data?.key) return null
+
+    // 鼠标移入 tooltip 时保持显示状态
+    const handleMouseEnter = () => {
+        if (!isSelection && anchorElement) {
+            anchorElement.classList.add(TOOLTIP_SHOW_CLASS)
         }
-        return
     }
-    const range = selection.getRangeAt(0)
-    const text = range.toString().trim()
-    if (text === '' || !isEnglishWord(text)) {
-        // 清理残留的osmosis-selection元素
-        const element = document.querySelector('osmosis-selection')
-        if (element) {
-            element.remove()
+
+    // 鼠标移出 tooltip 时隐藏
+    const handleMouseLeave = () => {
+        if (!isSelection && anchorElement) {
+            anchorElement.classList.remove(TOOLTIP_SHOW_CLASS)
         }
-        return
     }
-    const rect = range.getBoundingClientRect()
-    let element: HTMLElement | null = document.querySelector('osmosis-selection')
-    if (element == null) {
-        element = document.createElement('osmosis-selection')
-        document.body.appendChild(element)
+
+    // 阻止事件冒泡
+    const stopPropagation = (e: React.MouseEvent) => e.stopPropagation()
+    const preventDefault = (e: React.MouseEvent) => {
+        e.stopPropagation()
+        e.preventDefault()
     }
-    element.style.pointerEvents = 'none'
-    element.style.position = 'absolute'
-    element.style.display = 'block'
-    element.style.top = (rect.top + window.scrollY) + 'px'
-    element.style.left = (rect.left + window.scrollX) + 'px'
-    element.style.width = rect.width + 'px'
-    element.style.height = rect.height + 'px'
-    element.style.backgroundColor = 'transparent'
 
-    element.dataset.key = text.toLowerCase().trim()
-    element.dataset.text = text.trim()
-    return element
-}
+    return (
+        <div className={clsx("theme-root", { "dark": isDarkTheme })}>
+            <style>{styleText}</style>
+            <AnimatePresence>
+                <motion.div
+                    ref={tooltipRef}
+                    className={clsx(
+                        "osmosis-tooltip-container",
+                        "p-4 rounded-lg shadow-lg w-[300px]",
+                        "bg-surface text-text-primary",
+                        "pointer-events-auto"
+                    )}
+                    style={getPositionStyles()}
+                    initial="initial"
+                    animate="animate"
+                    exit="exit"
+                    variants={tooltipAnimationVariants[position]}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    onMouseDown={preventDefault}
+                    onMouseUp={stopPropagation}
+                    onClick={stopPropagation}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    {/* 内容区域 */}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-4">
+                            <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
+                        </div>
+                    ) : wordData?.code === 0 ? (
+                        <Detail text={data?.text || ''} data={wordData} />
+                    ) : (
+                        <div className="text-sm text-text-muted">
+                            {wordData?.message || "未找到释义"}
+                        </div>
+                    )}
 
-function getTargetElement() {
-    const target: HTMLElement | null = document.querySelector(`${OSMOSIS_STARRED_WORD_TAG.toLowerCase()}.${TOOLTIP_SHOW_CLASS}`)
-    return target
+                    {/* 箭头 */}
+                    <div style={getArrowStyles()}></div>
+                </motion.div>
+            </AnimatePresence>
+        </div>
+    )
 }
 
 export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () => {
-    const anchor = getSelection() || getTargetElement()
-    return anchor
+    return document.body
 }
 
-
-export const watchOverlayAnchor: PlasmoWatchOverlayAnchor = (
-    updatePosition
-) => {
-    let timer: any
-    const debounceUpdatePosition = (delay: number = 100) => {
-        clearTimeout(timer)
-        timer = setTimeout(updatePosition, delay)
-    }
-
-    // 立即更新位置（用于鼠标在 starred 单词间移动时）
-    const immediateUpdatePosition = () => {
-        clearTimeout(timer)
-        updatePosition()
-    }
-
-    // 监听 starred 单词上的 mouseover 事件，实现快速切换
-    const handleMouseOver = (e: MouseEvent) => {
-        const target = e.target as HTMLElement
-        if (target.tagName?.toUpperCase() === OSMOSIS_STARRED_WORD_TAG) {
-            // 鼠标移入 starred 单词时立即更新位置
-            immediateUpdatePosition()
-        }
-    }
-
-    window.addEventListener('resize', () => debounceUpdatePosition(100))
-    window.addEventListener('scroll', () => debounceUpdatePosition(100))
-    window.addEventListener('mouseup', () => debounceUpdatePosition(100))
-    document.addEventListener('mouseover', handleMouseOver)
-
-    const interval = setInterval(() => {
-        debounceUpdatePosition(500)
-    }, 1000)
-
-    // Clear the interval when unmounted
-    return () => {
-        clearInterval(interval)
-        window.removeEventListener('resize', () => debounceUpdatePosition(100))
-        window.removeEventListener('scroll', () => debounceUpdatePosition(100))
-        window.removeEventListener('mouseup', () => debounceUpdatePosition(100))
-        document.removeEventListener('mouseover', handleMouseOver)
-    }
-}
