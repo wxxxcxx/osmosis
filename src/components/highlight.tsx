@@ -38,7 +38,7 @@ export default function Highlight({
     return (
       <span
         className={clsx(
-          "absolute -top-[0.6em] left-0 w-full rounded-sm z-[999]",
+          "absolute -top-[0.6em] left-0 w-full rounded-sm",
           "text-[0.6em] leading-[1em] select-none",
           "overflow-hidden whitespace-nowrap block",
           "select-none"

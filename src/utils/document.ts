@@ -51,3 +51,14 @@ export function getTargetElement() {
     const target: HTMLElement | null = document.querySelector(`${OSMOSIS_STARRED_WORD_TAG.toLowerCase()}.${TOOLTIP_SHOW_CLASS}`)
     return target
 }
+
+export function checkVisible(el: HTMLElement | null): HTMLElement | null {
+    if (!el) return null
+    const rect = el.getBoundingClientRect()
+    const isInViewport =
+        rect.top < window.innerHeight &&
+        rect.bottom > 0 &&
+        rect.left < window.innerWidth &&
+        rect.right > 0
+    return isInViewport ? el : null
+}

@@ -1,8 +1,9 @@
 import { clsx } from "clsx";
 import styleText from 'data-text:../globals.css';
 import { AnimatePresence, motion } from "motion/react";
-import type { PlasmoGetOverlayAnchor } from "plasmo";
+import type { PlasmoCSUIJSXContainer, PlasmoGetOverlayAnchor, PlasmoRender } from "plasmo";
 import React from "react";
+import { createRoot } from "react-dom/client";
 import Detail from "~components/detail";
 import {
     tooltipAnimationVariants,
@@ -10,7 +11,7 @@ import {
     useTooltipPosition,
     useWordData
 } from "~hooks";
-import { TOOLTIP_SHOW_CLASS } from "~utils/constants";
+import { OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
 import { useSettings } from "~utils/settings";
 import { useTheme } from "~utils/theme";
 
@@ -25,7 +26,7 @@ const TooltipOverlay = () => {
     const [settings] = useSettings()
 
     // 获取 anchor 元素和相关数据
-    const { anchorElement, data, rect, isSelection } = useAnchorElement()
+    const { anchorElement, data, isSelection } = useAnchorElement()
 
     // 获取单词数据
     const { wordData, loading } = useWordData(data?.wordKey)
@@ -36,7 +37,7 @@ const TooltipOverlay = () => {
         position,
         getPositionStyles,
         getArrowStyles
-    } = useTooltipPosition(rect, [data?.wordKey, wordData, loading])
+    } = useTooltipPosition(anchorElement, [data?.wordKey, wordData, loading])
 
 
 
@@ -76,12 +77,17 @@ const TooltipOverlay = () => {
                         initial="initial"
                         animate="animate"
                         exit="exit"
+                        layout
+                        style={{
+                            ...getPositionStyles(),
+                            originY: position === 'top' ? 1 : 0,
+                        }}
                         transition={{
                             type: "spring",
                             damping: 25,
                             stiffness: 350,
                             mass: 0.5,
-                            layout: { duration: 0.3 }
+                            layout: { duration: 0.2 }
                         }}
                         className={clsx(
                             "osmosis-tooltip-container",
@@ -91,7 +97,7 @@ const TooltipOverlay = () => {
                             "pointer-events-auto",
                             "backdrop-blur-md bg-surface/90" // 增强质感
                         )}
-                        style={getPositionStyles()}
+
                         onMouseDown={preventDefault}
                         onMouseUp={stopPropagation}
                         onClick={stopPropagation}
@@ -122,6 +128,32 @@ const TooltipOverlay = () => {
 
 export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () => {
     return document.body
+}
+
+
+export const getRootContainer = async () => {
+    let rootContainer = document.querySelector(OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG) as HTMLElement
+    if (!rootContainer) {
+        rootContainer = document.createElement(OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG) as HTMLElement
+        document.body.appendChild(rootContainer)
+    }
+    return rootContainer
+}
+
+
+export const render: PlasmoRender<PlasmoCSUIJSXContainer> = async ({
+    createRootContainer
+}) => {
+    const rootContainer = await createRootContainer()
+    const container = (rootContainer instanceof NodeList ? rootContainer[0] : rootContainer) as HTMLElement
+
+    if (!container || container.shadowRoot) {
+        return
+    }
+
+    const shadow = container.attachShadow({ mode: 'open' })
+    const root = createRoot(shadow)
+    root.render(<TooltipOverlay />)
 }
 
 export default TooltipOverlay

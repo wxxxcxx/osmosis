@@ -9,6 +9,8 @@
  */
 export const OSMOSIS_STARRED_WORD_TAG = 'OSMOSIS-STARRED-WORD'
 
+export const OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG = 'OSMOSIS-TOOLTIP-CONTAINER-ROOT'
+
 /**
  * Tooltip 显示状态的 CSS 类名
  */

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { getSelectionElement, getTargetElement } from "~utils/document"
+import { checkVisible, getSelectionElement, getTargetElement } from "~utils/document"
 
 export interface AnchorData {
     wordKey: string
@@ -12,8 +12,6 @@ export interface UseAnchorElementResult {
     anchorElement: HTMLElement | null
     /** 从 anchor 元素解析的数据 */
     data: AnchorData | null
-    /** anchor 元素的位置信息 */
-    rect: DOMRect | null
     /** 是否为选区元素 */
     isSelection: boolean
 }
@@ -29,8 +27,18 @@ export function useAnchorElement(): UseAnchorElementResult {
 
     useEffect(() => {
         const updateAnchor = () => {
-            const el = getSelectionElement() || getTargetElement()
-            setAnchorElement(el)
+            // 独立检查：优先选区，选区不可见时 fallback 到 target 元素
+            const selectionEl = getSelectionElement()
+            const visibleSelection = checkVisible(selectionEl)
+
+            if (visibleSelection) {
+                setAnchorElement(visibleSelection)
+                return
+            }
+
+            const targetEl = getTargetElement()
+            const visibleTarget = checkVisible(targetEl)
+            setAnchorElement(visibleTarget)
         }
 
         const observer = new MutationObserver(updateAnchor)
@@ -41,33 +49,33 @@ export function useAnchorElement(): UseAnchorElementResult {
             attributeFilter: ['class']
         })
 
-        // 监听选区变化
+        // 监听交互和滚动变化
+        document.addEventListener("mouseup", updateAnchor)
         document.addEventListener("selectionchange", updateAnchor)
+        window.addEventListener("scroll", updateAnchor, { passive: true, capture: true })
 
-        // 初始更新
         updateAnchor()
 
         return () => {
             observer.disconnect()
+            document.removeEventListener("mouseup", updateAnchor)
             document.removeEventListener("selectionchange", updateAnchor)
+            window.removeEventListener("scroll", updateAnchor, { capture: true })
         }
     }, [])
 
     // 从 anchor 元素获取数据
     const data = useMemo<AnchorData | null>(() => {
+        console.log(anchorElement)
         if (!anchorElement) return null
-        return {
+        const result = {
             wordKey: anchorElement.dataset.key || '',
             text: anchorElement.dataset.text || '',
             id: anchorElement.dataset.id || '',
         }
-    }, [anchorElement])
-
-    // 获取 anchor 元素的位置
-    const rect = useMemo(() => {
-        if (!anchorElement) return null
-        return anchorElement.getBoundingClientRect()
-    }, [anchorElement])
+        console.log('Anchor data:', result)
+        return result
+    }, [anchorElement?.dataset.id])
 
     // 判断 anchor 是否为选区元素
     const isSelection = anchorElement?.tagName?.toLowerCase() === 'osmosis-selection'
@@ -75,7 +83,6 @@ export function useAnchorElement(): UseAnchorElementResult {
     return {
         anchorElement,
         data,
-        rect,
         isSelection
     }
 }

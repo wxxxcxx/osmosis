@@ -90,7 +90,7 @@ function calculateBestPosition(
  * @param deps - 额外的依赖项，变化时触发重新计算
  */
 export function useTooltipPosition(
-    anchorRect: DOMRect | null,
+    anchorElement: HTMLElement | null,
     deps: React.DependencyList = []
 ): UseTooltipPositionResult {
     const tooltipRef = useRef<HTMLDivElement>(null)
@@ -98,9 +98,9 @@ export function useTooltipPosition(
     const [offset, setOffset] = useState<TooltipOffset>({ x: 0, y: 0 })
     const [actualSize, setActualSize] = useState({ width: 300, height: 300 })
 
-    // 预设尺寸用于初始计算，实际计算将使用真实测量值
-    const TOOLTIP_WIDTH = actualSize.width
-    const TOOLTIP_HEIGHT = actualSize.height
+    // 用于计算方向的参考高度，使用最大高度以保证加载过程中的方向稳定性
+    const STABLE_HEIGHT = 300
+    const STABLE_WIDTH = 300
 
     // 监听尺寸变化
     useLayoutEffect(() => {
@@ -108,9 +108,9 @@ export function useTooltipPosition(
 
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
-                const { width, height } = entry.contentRect
-                if (width > 0 && height > 0) {
-                    setActualSize({ width, height })
+                const rect = entry.target.getBoundingClientRect()
+                if (rect.width > 0 && rect.height > 0) {
+                    setActualSize({ width: rect.width, height: rect.height })
                 }
             }
         })
@@ -119,51 +119,73 @@ export function useTooltipPosition(
         return () => observer.disconnect()
     }, [])
 
-    // 计算位置
+    const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null)
+
+    // 监听元素位置变化
+    useLayoutEffect(() => {
+        const updateRect = () => {
+            if (anchorElement) {
+                setAnchorRect(anchorElement.getBoundingClientRect())
+            } else {
+                setAnchorRect(null)
+            }
+        }
+
+        updateRect()
+        window.addEventListener("resize", updateRect)
+        window.addEventListener("scroll", updateRect, { capture: true, passive: true })
+
+        return () => {
+            window.removeEventListener("resize", updateRect)
+            window.removeEventListener("scroll", updateRect, { capture: true })
+        }
+    }, [anchorElement])
+
+    // 计算位置方向（基于稳定尺寸，防止加载时方向跳动）
     useLayoutEffect(() => {
         if (!anchorRect) return
 
         const { position: newPosition, offset: newOffset } = calculateBestPosition(
             anchorRect,
-            TOOLTIP_WIDTH,
-            TOOLTIP_HEIGHT
+            STABLE_WIDTH,
+            STABLE_HEIGHT
         )
 
         setPosition(newPosition)
         setOffset(newOffset)
-    }, [anchorRect, TOOLTIP_WIDTH, TOOLTIP_HEIGHT, ...deps])
+    }, [anchorRect, ...deps])
 
     // 位置样式 - 基于视口 (0,0) 计算绝对位置
     const getPositionStyles = (): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {
-            position: 'absolute',
+            position: 'fixed',
         }
 
         if (!anchorRect) return baseStyles
 
-        const tooltipWidth = TOOLTIP_WIDTH
-        const tooltipHeight = TOOLTIP_HEIGHT
+        const tooltipWidth = actualSize.width
+        const tooltipHeight = actualSize.height
 
         const scrollY = window.scrollY
         const scrollX = window.scrollX
         const gap = 8
 
         const anchorCenterX = anchorRect.left + anchorRect.width / 2
-        const anchorCenterY = anchorRect.top + anchorRect.height / 2
+        const viewportHeight = window.innerHeight
 
         switch (position) {
             case 'top':
                 return {
                     ...baseStyles,
-                    // top 指向 anchor 顶部，实际位置由 y: -100% 修正
-                    top: `${anchorRect.top + scrollY - gap}px`,
-                    left: `${anchorCenterX + scrollX - tooltipWidth / 2 + offset.x}px`,
+                    // fixed 定位下，使用视口高度计算 bottom
+                    bottom: `${viewportHeight - anchorRect.top + gap}px`,
+                    left: `${anchorCenterX - tooltipWidth / 2 + offset.x}px`,
                 }
             case 'bottom':
                 return {
                     ...baseStyles,
-                    top: `${anchorRect.bottom + scrollY + gap}px`,
-                    left: `${anchorCenterX + scrollX - tooltipWidth / 2 + offset.x}px`,
+                    top: `${anchorRect.bottom + gap}px`,
+                    left: `${anchorCenterX - tooltipWidth / 2 + offset.x}px`,
                 }
             default:
                 return baseStyles
@@ -220,9 +242,9 @@ export const tooltipAnimationVariants: Record<TooltipPosition, {
     exit: { opacity: number; x?: number | string; y?: number | string }
 }> = {
     top: {
-        initial: { opacity: 0, y: 'calc(-100% + 8px)' },
-        animate: { opacity: 1, y: '-100%' },
-        exit: { opacity: 0, y: 'calc(-100% + 8px)' },
+        initial: { opacity: 0, y: 8 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 8 },
     },
     bottom: {
         initial: { opacity: 0, y: -8 },
