@@ -19,7 +19,7 @@ import { useTheme } from "~utils/theme";
  * 
  * 用于在 starred 单词或选区上显示单词释义的 tooltip
  */
-function TooltipOverlay() {
+export default function TooltipOverlay() {
     // 主题和设置
     const isDarkTheme = useTheme()
     const [settings] = useSettings()
@@ -28,7 +28,7 @@ function TooltipOverlay() {
     const { anchorElement, data, rect, isSelection } = useAnchorElement()
 
     // 获取单词数据
-    const { wordData, loading } = useWordData(data?.key)
+    const { wordData, loading } = useWordData(data?.wordKey)
 
     // 计算 tooltip 位置
     const {
@@ -39,7 +39,7 @@ function TooltipOverlay() {
     } = useTooltipPosition(rect, [wordData, loading])
 
     // 不满足显示条件时返回 null
-    if (!settings || !data?.key) return null
+    if (!settings || !data?.wordKey) return null
 
     // 鼠标移入 tooltip 时保持显示状态
     const handleMouseEnter = () => {
@@ -75,10 +75,9 @@ function TooltipOverlay() {
                         "pointer-events-auto"
                     )}
                     style={getPositionStyles()}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    variants={tooltipAnimationVariants[position]}
+                    initial={tooltipAnimationVariants[position]?.initial ?? tooltipAnimationVariants.bottom.initial}
+                    animate={tooltipAnimationVariants[position]?.animate ?? tooltipAnimationVariants.bottom.animate}
+                    exit={tooltipAnimationVariants[position]?.exit ?? tooltipAnimationVariants.bottom.exit}
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     onMouseDown={preventDefault}
                     onMouseUp={stopPropagation}

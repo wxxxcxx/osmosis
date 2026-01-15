@@ -29,9 +29,9 @@ const renderRootContainer = async (rootContainer: HTMLElement) => {
     }
     const shadow = rootContainer.attachShadow({ mode: 'open' })
     const root = createRoot(shadow)
-    const key = rootContainer.dataset.key
+    const wordKey = rootContainer.dataset.key
     const text = rootContainer.dataset.text
-    root.render(<Highlight key={key} text={text}></Highlight>)
+    root.render(<Highlight wordKey={wordKey} text={text}></Highlight>)
 }
 
 export const render: PlasmoRender<PlasmoCSUIJSXContainer> = async ({

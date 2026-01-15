@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { getSelectionElement, getTargetElement } from "~utils/document"
 
 export interface AnchorData {
-    key: string
+    wordKey: string
     text: string
     id: string
 }
@@ -57,7 +57,7 @@ export function useAnchorElement(): UseAnchorElementResult {
     const data = useMemo<AnchorData | null>(() => {
         if (!anchorElement) return null
         return {
-            key: anchorElement.dataset.key || '',
+            wordKey: anchorElement.dataset.key || '',
             text: anchorElement.dataset.text || '',
             id: anchorElement.dataset.id || '',
         }

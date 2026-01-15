@@ -18,16 +18,16 @@ export interface UseWordDataResult {
 /**
  * 获取单词的详细数据
  * 
- * 当 key 变化时，自动从后台获取单词的释义和状态
+ * 当 wordKey 变化时，自动从后台获取单词的释义和状态
  * 
- * @param key - 单词的 key（小写形式）
+ * @param wordKey - 单词的 key（小写形式）
  */
-export function useWordData(key: string | undefined): UseWordDataResult {
+export function useWordData(wordKey: string | undefined): UseWordDataResult {
     const [wordData, setWordData] = useState<WordData | null>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (!key) {
+        if (!wordKey) {
             setWordData(null)
             setLoading(false)
             return
@@ -38,7 +38,7 @@ export function useWordData(key: string | undefined): UseWordDataResult {
             try {
                 const response = await sendToBackground({
                     name: 'query',
-                    body: { key }
+                    body: { key: wordKey }
                 })
                 setWordData(response)
             } catch (error) {
@@ -55,7 +55,7 @@ export function useWordData(key: string | undefined): UseWordDataResult {
         }
 
         fetchData()
-    }, [key])
+    }, [wordKey])
 
     return {
         wordData,

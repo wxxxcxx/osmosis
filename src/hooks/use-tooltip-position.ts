@@ -235,25 +235,29 @@ export function useTooltipPosition(
 }
 
 /** 动画变体配置 */
-export const tooltipAnimationVariants = {
+export const tooltipAnimationVariants: Record<TooltipPosition, {
+    initial: { opacity: number; x?: number; y?: number }
+    animate: { opacity: number; x?: number; y?: number }
+    exit: { opacity: number; x?: number; y?: number }
+}> = {
     top: {
         initial: { opacity: 0, y: 8 },
         animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: 8 }
+        exit: { opacity: 0, y: 8 },
     },
     bottom: {
         initial: { opacity: 0, y: -8 },
         animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -8 }
+        exit: { opacity: 0, y: -8 },
     },
     left: {
         initial: { opacity: 0, x: 8 },
         animate: { opacity: 1, x: 0 },
-        exit: { opacity: 0, x: 8 }
+        exit: { opacity: 0, x: 8 },
     },
     right: {
         initial: { opacity: 0, x: -8 },
         animate: { opacity: 1, x: 0 },
-        exit: { opacity: 0, x: -8 }
-    }
+        exit: { opacity: 0, x: -8 },
+    },
 }

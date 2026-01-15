@@ -5,10 +5,10 @@ import { useSettings } from "../utils/settings"
 import { useTheme } from "~utils/theme"
 
 export default function Highlight({
-  key,
+  wordKey,
   text,
 }: {
-  key: string
+  wordKey: string
   text: string
 }) {
   const isDarkTheme = useTheme()
