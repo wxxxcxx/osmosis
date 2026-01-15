@@ -15,7 +15,7 @@ export interface UseTooltipPositionResult {
     /** 边界修正偏移量 */
     offset: TooltipOffset
     /** 获取 tooltip 的位置样式 */
-    getPositionStyles: () => React.CSSProperties | undefined
+    getPositionStyles: () => React.CSSProperties
     /** 获取箭头的样式 */
     getArrowStyles: () => React.CSSProperties
 }
@@ -124,17 +124,17 @@ export function useTooltipPosition(
     }, [anchorRect, ...deps])
 
     // 位置样式 - 基于视口 (0,0) 计算绝对位置
-    const getPositionStyles = (): React.CSSProperties | undefined => {
-        if (!anchorRect || !tooltipRef.current) return undefined
-
-        const tooltipRect = tooltipRef.current.getBoundingClientRect()
-        const tooltipWidth = tooltipRect.width || 300
-        const tooltipHeight = tooltipRect.height || 100
-
+    const getPositionStyles = (): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {
             position: 'fixed',
             zIndex: 2147483647,
         }
+
+        if (!anchorRect || !tooltipRef.current) return baseStyles
+
+        const tooltipRect = tooltipRef.current.getBoundingClientRect()
+        const tooltipWidth = tooltipRect.width || 300
+        const tooltipHeight = tooltipRect.height || 100
 
         const gap = 8
 
