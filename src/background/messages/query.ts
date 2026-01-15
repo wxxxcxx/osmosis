@@ -42,6 +42,7 @@ const saveToCache = async (queryKey: string, definitions: string[]) => {
 }
 
 export const query = async (queryKey: string) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000))
   if (!queryKey) {
     throw new Error(`No word provided`)
   }

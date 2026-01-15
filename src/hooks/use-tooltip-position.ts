@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react"
 
-export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right'
+export type TooltipPosition = 'top' | 'bottom'
 
 export interface TooltipOffset {
     x: number
@@ -40,24 +40,13 @@ function calculateBestPosition(
     const requiredHeight = tooltipHeight + margin
     const requiredWidth = tooltipWidth + margin
 
-    // 优先选择下方，其次上方，再次右侧，最后左侧
+    // 优先选择下方，其次上方
     let position: TooltipPosition = 'bottom'
 
     if (spaceBottom >= requiredHeight) {
         position = 'bottom'
-    } else if (spaceTop >= requiredHeight) {
-        position = 'top'
-    } else if (spaceRight >= requiredWidth) {
-        position = 'right'
-    } else if (spaceLeft >= requiredWidth) {
-        position = 'left'
     } else {
-        // 空间都不够，选择空间最大的方向
-        const maxSpace = Math.max(spaceBottom, spaceTop, spaceRight, spaceLeft)
-        if (maxSpace === spaceBottom) position = 'bottom'
-        else if (maxSpace === spaceTop) position = 'top'
-        else if (maxSpace === spaceRight) position = 'right'
-        else position = 'left'
+        position = 'top'
     }
 
     // 计算偏移量，确保 tooltip 不超出视口
@@ -107,35 +96,56 @@ export function useTooltipPosition(
     const tooltipRef = useRef<HTMLDivElement>(null)
     const [position, setPosition] = useState<TooltipPosition>('bottom')
     const [offset, setOffset] = useState<TooltipOffset>({ x: 0, y: 0 })
+    const [actualSize, setActualSize] = useState({ width: 300, height: 300 })
+
+    // 预设尺寸用于初始计算，实际计算将使用真实测量值
+    const TOOLTIP_WIDTH = actualSize.width
+    const TOOLTIP_HEIGHT = actualSize.height
+
+    // 监听尺寸变化
+    useLayoutEffect(() => {
+        if (!tooltipRef.current) return
+
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect
+                if (width > 0 && height > 0) {
+                    setActualSize({ width, height })
+                }
+            }
+        })
+
+        observer.observe(tooltipRef.current)
+        return () => observer.disconnect()
+    }, [])
 
     // 计算位置
     useLayoutEffect(() => {
-        if (!tooltipRef.current || !anchorRect) return
+        if (!anchorRect) return
 
-        const tooltipRect = tooltipRef.current.getBoundingClientRect()
         const { position: newPosition, offset: newOffset } = calculateBestPosition(
             anchorRect,
-            tooltipRect.width,
-            tooltipRect.height
+            TOOLTIP_WIDTH,
+            TOOLTIP_HEIGHT
         )
 
         setPosition(newPosition)
         setOffset(newOffset)
-    }, [anchorRect, ...deps])
+    }, [anchorRect, TOOLTIP_WIDTH, TOOLTIP_HEIGHT, ...deps])
 
     // 位置样式 - 基于视口 (0,0) 计算绝对位置
     const getPositionStyles = (): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {
-            position: 'fixed',
-            zIndex: 2147483647,
+            position: 'absolute',
         }
 
-        if (!anchorRect || !tooltipRef.current) return baseStyles
+        if (!anchorRect) return baseStyles
 
-        const tooltipRect = tooltipRef.current.getBoundingClientRect()
-        const tooltipWidth = tooltipRect.width || 300
-        const tooltipHeight = tooltipRect.height || 100
+        const tooltipWidth = TOOLTIP_WIDTH
+        const tooltipHeight = TOOLTIP_HEIGHT
 
+        const scrollY = window.scrollY
+        const scrollX = window.scrollX
         const gap = 8
 
         const anchorCenterX = anchorRect.left + anchorRect.width / 2
@@ -145,26 +155,15 @@ export function useTooltipPosition(
             case 'top':
                 return {
                     ...baseStyles,
-                    top: `${anchorRect.top - tooltipHeight - gap}px`,
-                    left: `${anchorCenterX - tooltipWidth / 2 + offset.x}px`,
+                    // top 指向 anchor 顶部，实际位置由 y: -100% 修正
+                    top: `${anchorRect.top + scrollY - gap}px`,
+                    left: `${anchorCenterX + scrollX - tooltipWidth / 2 + offset.x}px`,
                 }
             case 'bottom':
                 return {
                     ...baseStyles,
-                    top: `${anchorRect.bottom + gap}px`,
-                    left: `${anchorCenterX - tooltipWidth / 2 + offset.x}px`,
-                }
-            case 'left':
-                return {
-                    ...baseStyles,
-                    left: `${anchorRect.left - tooltipWidth - gap}px`,
-                    top: `${anchorCenterY - tooltipHeight / 2 + offset.y}px`,
-                }
-            case 'right':
-                return {
-                    ...baseStyles,
-                    left: `${anchorRect.right + gap}px`,
-                    top: `${anchorCenterY - tooltipHeight / 2 + offset.y}px`,
+                    top: `${anchorRect.bottom + scrollY + gap}px`,
+                    left: `${anchorCenterX + scrollX - tooltipWidth / 2 + offset.x}px`,
                 }
             default:
                 return baseStyles
@@ -200,26 +199,6 @@ export function useTooltipPosition(
                     borderRight: '6px solid transparent',
                     borderBottom: '6px solid var(--color-bg-surface)',
                 }
-            case 'left':
-                return {
-                    ...baseStyles,
-                    right: '-6px',
-                    top: '50%',
-                    transform: `translateY(calc(-50% - ${offset.y}px))`,
-                    borderTop: '6px solid transparent',
-                    borderBottom: '6px solid transparent',
-                    borderLeft: '6px solid var(--color-bg-surface)',
-                }
-            case 'right':
-                return {
-                    ...baseStyles,
-                    left: '-6px',
-                    top: '50%',
-                    transform: `translateY(calc(-50% - ${offset.y}px))`,
-                    borderTop: '6px solid transparent',
-                    borderBottom: '6px solid transparent',
-                    borderRight: '6px solid var(--color-bg-surface)',
-                }
             default:
                 return baseStyles
         }
@@ -236,28 +215,18 @@ export function useTooltipPosition(
 
 /** 动画变体配置 */
 export const tooltipAnimationVariants: Record<TooltipPosition, {
-    initial: { opacity: number; x?: number; y?: number }
-    animate: { opacity: number; x?: number; y?: number }
-    exit: { opacity: number; x?: number; y?: number }
+    initial: { opacity: number; x?: number | string; y?: number | string }
+    animate: { opacity: number; x?: number | string; y?: number | string }
+    exit: { opacity: number; x?: number | string; y?: number | string }
 }> = {
     top: {
-        initial: { opacity: 0, y: 8 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: 8 },
+        initial: { opacity: 0, y: 'calc(-100% + 8px)' },
+        animate: { opacity: 1, y: '-100%' },
+        exit: { opacity: 0, y: 'calc(-100% + 8px)' },
     },
     bottom: {
         initial: { opacity: 0, y: -8 },
         animate: { opacity: 1, y: 0 },
         exit: { opacity: 0, y: -8 },
-    },
-    left: {
-        initial: { opacity: 0, x: 8 },
-        animate: { opacity: 1, x: 0 },
-        exit: { opacity: 0, x: 8 },
-    },
-    right: {
-        initial: { opacity: 0, x: -8 },
-        animate: { opacity: 1, x: 0 },
-        exit: { opacity: 0, x: -8 },
     },
 }

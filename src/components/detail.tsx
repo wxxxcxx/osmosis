@@ -48,7 +48,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
   }
 
   return (
-    <div className="flex flex-col w-full max-w-full">
+    <div className="flex flex-1 min-h-0 flex-col w-full max-w-full">
       {/* Header */}
       <div className="flex flex-row items-center justify-between gap-4 pb-2 mb-2 border-b border-border">
         <div className="text-xl font-bold text-text-primary break-words">
@@ -79,8 +79,8 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
 
       {/* Content - Scrollable */}
       <div className={clsx(
-        "flex flex-col gap-2 pr-1", // pr-1 for scrollbar spacing
-        "max-h-[250px] overflow-y-auto scrollbar-thin",
+        "flex flex-1 min-h-0 flex-col gap-2 pr-1", // 使用 flex-1 使其填满空间并触发滚动
+        "overflow-y-auto overflow-x-hidden scrollbar-thin",
         "scrollbar-thumb-border scrollbar-track-transparent"
       )}>
         {data.definitions && data.definitions.length > 0 ? (

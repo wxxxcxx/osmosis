@@ -1,9 +1,11 @@
 import { clsx } from "clsx";
 import styleText from 'data-text:../globals.css';
+import { AnimatePresence, motion } from "motion/react";
 import type { PlasmoGetOverlayAnchor } from "plasmo";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Detail from "~components/detail";
 import {
+    tooltipAnimationVariants,
     useAnchorElement,
     useTooltipPosition,
     useWordData
@@ -17,7 +19,7 @@ import { useTheme } from "~utils/theme";
  * 
  * 用于在 starred 单词或选区上显示单词释义的 tooltip
  */
-export default function TooltipOverlay() {
+const TooltipOverlay = () => {
     // 主题和设置
     const isDarkTheme = useTheme()
     const [settings] = useSettings()
@@ -34,7 +36,7 @@ export default function TooltipOverlay() {
         position,
         getPositionStyles,
         getArrowStyles
-    } = useTooltipPosition(rect, [wordData, loading])
+    } = useTooltipPosition(rect, [data?.wordKey, wordData, loading])
 
 
 
@@ -59,60 +61,67 @@ export default function TooltipOverlay() {
         e.preventDefault()
     }
 
-    // 动画状态：挂载后触发
-    const [isVisible, setIsVisible] = useState(false)
-    useEffect(() => {
-        setIsVisible(false) // 重置状态
-        const timer = requestAnimationFrame(() => setIsVisible(true))
-        return () => cancelAnimationFrame(timer)
-    }, [data?.wordKey]) // 当单词变化时重置动画
-
     // 不满足显示条件时返回 null
-    if (!settings || !data?.wordKey) return null
+    const showTooltip = !!(settings && data?.wordKey);
 
     return (
         <div className={clsx("theme-root", { "dark": isDarkTheme })}>
             <style>{styleText}</style>
-            <div
-                ref={tooltipRef}
-                className={clsx(
-                    "osmosis-tooltip-container",
-                    "p-4 rounded-lg shadow-lg w-[300px]",
-                    "bg-surface text-text-primary",
-                    "pointer-events-auto",
-                    "transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]", // 弹性曲线
-                    isVisible
-                        ? "opacity-100 scale-100 translate-y-0"
-                        : "opacity-0 scale-95 translate-y-2"
-                )}
-                style={getPositionStyles()}
-                onMouseDown={preventDefault}
-                onMouseUp={stopPropagation}
-                onClick={stopPropagation}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                {/* 内容区域 */}
-                {loading ? (
-                    <div className="flex items-center justify-center py-4">
-                        <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
-                    </div>
-                ) : wordData?.code === 0 ? (
-                    <Detail text={data?.text || ''} data={wordData} />
-                ) : (
-                    <div className="text-sm text-text-muted">
-                        {wordData?.message || "未找到释义"}
-                    </div>
-                )}
+            <AnimatePresence mode="wait">
+                {showTooltip && (
+                    <motion.div
+                        key={data.wordKey}
+                        ref={tooltipRef}
+                        variants={tooltipAnimationVariants[position]}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={{
+                            type: "spring",
+                            damping: 25,
+                            stiffness: 350,
+                            mass: 0.5,
+                            layout: { duration: 0.3 }
+                        }}
+                        className={clsx(
+                            "osmosis-tooltip-container",
+                            "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px]",
+                            "flex flex-col",
+                            "bg-surface text-text-primary",
+                            "pointer-events-auto",
+                            "backdrop-blur-md bg-surface/90" // 增强质感
+                        )}
+                        style={getPositionStyles()}
+                        onMouseDown={preventDefault}
+                        onMouseUp={stopPropagation}
+                        onClick={stopPropagation}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        {/* 内容区域 */}
+                        {loading ? (
+                            <div className="flex items-center justify-center py-4">
+                                <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
+                            </div>
+                        ) : wordData?.code === 0 ? (
+                            <Detail text={data?.text || ''} data={wordData} />
+                        ) : (
+                            <div className="text-sm text-text-muted">
+                                {wordData?.message || "未找到释义"}
+                            </div>
+                        )}
 
-                {/* 箭头 */}
-                <div style={getArrowStyles()}></div>
-            </div>
+                        {/* 箭头 */}
+                        <div style={getArrowStyles()}></div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
-    )
+    );
 }
 
 export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () => {
     return document.body
 }
 
+export default TooltipOverlay
