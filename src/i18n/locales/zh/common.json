@@ -1,0 +1,8 @@
+{
+    "loading": "加载中...",
+    "retry": "重试",
+    "loadFailed": "加载失败",
+    "operationFailed": "操作失败，请重试",
+    "noDefinitions": "未找到释义",
+    "example": "例如"
+}

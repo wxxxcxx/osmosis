@@ -1,0 +1,8 @@
+{
+    "loading": "Loading...",
+    "retry": "Retry",
+    "loadFailed": "Load failed",
+    "operationFailed": "Operation failed, please retry",
+    "noDefinitions": "No definitions found",
+    "example": "e.g."
+}

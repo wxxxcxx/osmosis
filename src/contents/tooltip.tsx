@@ -12,6 +12,7 @@ import {
     useWordData
 } from "~hooks";
 import { OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
+import { useTranslation } from "~utils/i18n";
 import { useSettings } from "~utils/settings";
 import { useTheme } from "~utils/theme";
 
@@ -21,6 +22,7 @@ import { useTheme } from "~utils/theme";
  * 用于在 starred 单词或选区上显示单词释义的 tooltip
  */
 const TooltipOverlay = () => {
+    const { t } = useTranslation('common')
     // 主题和设置
     const isDarkTheme = useTheme()
     const [settings] = useSettings()
@@ -113,7 +115,7 @@ const TooltipOverlay = () => {
                             <Detail text={data?.text || ''} data={wordData} />
                         ) : (
                             <div className="text-sm text-text-muted">
-                                {wordData?.message || "未找到释义"}
+                                {wordData?.message || t('noDefinitions')}
                             </div>
                         )}
 

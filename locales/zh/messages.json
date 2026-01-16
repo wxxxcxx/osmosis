@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Osmosis",
+        "description": "扩展名称"
+    },
+    "extensionDescription": {
+        "message": "Osmosis 通过潜移默化的方式帮助你记忆生词",
+        "description": "扩展描述"
+    }
+}

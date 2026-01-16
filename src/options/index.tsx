@@ -4,12 +4,14 @@ import React from "react"
 import "../globals.css"
 
 import { useSettings, type DictionaryProviderType } from "../utils/settings"
+import { useTranslation } from "~utils/i18n"
 
 function Options() {
+    const { t } = useTranslation(['options', 'common'])
     const [settings, setSettings] = useSettings()
 
     if (!settings) {
-        return <div>Loading...</div>
+        return <div>{t('common:loading')}</div>
     }
 
     React.useEffect(() => {
@@ -38,15 +40,15 @@ function Options() {
 
     return (
         <div className={clsx("p-8 max-w-2xl mx-auto font-sans text-[#333] dark:text-[#ccc]")}>
-            <h1 className="text-2xl font-bold mb-6">Osmosis Settings</h1>
+            <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
 
             <div className="space-y-6">
                 {/* Translation Toggle */}
                 <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
                     <div>
-                        <h3 className="font-semibold text-lg">Show Translations</h3>
+                        <h3 className="font-semibold text-lg">{t('showTranslations.label')}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Display the first definition next to the highlighted word.
+                            {t('showTranslations.description')}
                         </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -63,9 +65,9 @@ function Options() {
                 {/* Dictionary Provider Select */}
                 <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
                     <div>
-                        <h3 className="font-semibold text-lg">Dictionary</h3>
+                        <h3 className="font-semibold text-lg">{t('dictionary.label')}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Choose the dictionary API for word definitions.
+                            {t('dictionary.description')}
                         </p>
                     </div>
                     <select
@@ -73,17 +75,17 @@ function Options() {
                         onChange={handleDictionaryChange}
                         className="bg-white dark:bg-[#555] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 max-w-[180px]"
                     >
-                        <option value="freedictionary">Free Dictionary</option>
-                        <option value="youdao">有道词典</option>
+                        <option value="freedictionary">{t('dictionary.freeDictionary')}</option>
+                        <option value="youdao">{t('dictionary.youdao')}</option>
                     </select>
                 </div>
 
                 {/* Highlight Style Select */}
                 <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
                     <div>
-                        <h3 className="font-semibold text-lg">Highlight Style</h3>
+                        <h3 className="font-semibold text-lg">{t('highlightStyle.label')}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Choose how the starred words are underlined.
+                            {t('highlightStyle.description')}
                         </p>
                     </div>
                     <select
@@ -91,20 +93,20 @@ function Options() {
                         onChange={handleStyleChange}
                         className="bg-white dark:bg-[#555] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 max-w-[150px]"
                     >
-                        <option value="wavy">Wavy</option>
-                        <option value="solid">Solid</option>
-                        <option value="dotted">Dotted</option>
-                        <option value="dashed">Dashed</option>
-                        <option value="none">None</option>
+                        <option value="wavy">{t('highlightStyle.wavy')}</option>
+                        <option value="solid">{t('highlightStyle.solid')}</option>
+                        <option value="dotted">{t('highlightStyle.dotted')}</option>
+                        <option value="dashed">{t('highlightStyle.dashed')}</option>
+                        <option value="none">{t('highlightStyle.none')}</option>
                     </select>
                 </div>
 
                 {/* Theme Select */}
                 <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
                     <div>
-                        <h3 className="font-semibold text-lg">Theme</h3>
+                        <h3 className="font-semibold text-lg">{t('theme.label')}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Select the extension theme.
+                            {t('theme.description')}
                         </p>
                     </div>
                     <select
@@ -112,20 +114,20 @@ function Options() {
                         onChange={handleThemeChange}
                         className="bg-white dark:bg-[#555] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 max-w-[150px]"
                     >
-                        <option value="auto">Auto</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
+                        <option value="auto">{t('theme.auto')}</option>
+                        <option value="light">{t('theme.light')}</option>
+                        <option value="dark">{t('theme.dark')}</option>
                     </select>
                 </div>
 
                 {/* Colors Configuration */}
                 <div className="flex flex-col gap-4 p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
-                    <h3 className="font-semibold text-lg">Colors</h3>
+                    <h3 className="font-semibold text-lg">{t('colors.title')}</h3>
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="font-medium text-sm">Highlight Color</span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Color of the underline</p>
+                            <span className="font-medium text-sm">{t('colors.highlight.label')}</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.highlight.description')}</p>
                         </div>
                         <input
                             type="color"
@@ -137,8 +139,8 @@ function Options() {
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="font-medium text-sm">Translation Background</span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Background of the translation pill</p>
+                            <span className="font-medium text-sm">{t('colors.translationBg.label')}</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.translationBg.description')}</p>
                         </div>
                         <input
                             type="color"
@@ -150,8 +152,8 @@ function Options() {
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="font-medium text-sm">Translation Text</span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Foreground color of text</p>
+                            <span className="font-medium text-sm">{t('colors.translationText.label')}</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.translationText.description')}</p>
                         </div>
                         <input
                             type="color"
@@ -168,4 +170,3 @@ function Options() {
 }
 
 export default Options
-

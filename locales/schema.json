@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "additionalProperties": {
+        "type": "object",
+        "properties": {
+            "message": {
+                "type": "string",
+                "description": "The localized message string"
+            },
+            "description": {
+                "type": "string",
+                "description": "Description of where this message is used"
+            },
+            "placeholders": {
+                "type": "object",
+                "description": "Placeholders for dynamic content in the message",
+                "additionalProperties": {
+                    "type": "object",
+                    "properties": {
+                        "content": {
+                            "type": "string"
+                        },
+                        "example": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "content"
+                    ]
+                }
+            }
+        },
+        "required": [
+            "message"
+        ]
+    }
+}

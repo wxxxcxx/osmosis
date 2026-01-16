@@ -1,0 +1,44 @@
+{
+    "title": "Osmosis 设置",
+    "showTranslations": {
+        "label": "显示翻译",
+        "description": "在高亮单词旁边显示第一个释义"
+    },
+    "dictionary": {
+        "label": "词典",
+        "description": "选择用于查询单词释义的词典 API",
+        "freeDictionary": "Free Dictionary",
+        "youdao": "有道词典"
+    },
+    "highlightStyle": {
+        "label": "高亮样式",
+        "description": "选择收藏单词的下划线样式",
+        "wavy": "波浪线",
+        "solid": "实线",
+        "dotted": "点线",
+        "dashed": "虚线",
+        "none": "无"
+    },
+    "theme": {
+        "label": "主题",
+        "description": "选择扩展主题",
+        "auto": "自动",
+        "light": "浅色",
+        "dark": "深色"
+    },
+    "colors": {
+        "title": "颜色",
+        "highlight": {
+            "label": "高亮颜色",
+            "description": "下划线颜色"
+        },
+        "translationBg": {
+            "label": "翻译背景",
+            "description": "翻译标签的背景颜色"
+        },
+        "translationText": {
+            "label": "翻译文字",
+            "description": "文字的前景颜色"
+        }
+    }
+}

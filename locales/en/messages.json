@@ -1,0 +1,10 @@
+{
+    "extensionName": {
+        "message": "Osmosis",
+        "description": "Name of the extension"
+    },
+    "extensionDescription": {
+        "message": "Osmosis helps you learn unfamiliar words by slowly seeping them into your memory.",
+        "description": "Description of the extension"
+    }
+}

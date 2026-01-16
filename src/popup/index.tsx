@@ -7,6 +7,7 @@ import "../globals.css"
 import { sendToBackground } from "@plasmohq/messaging"
 import { useSettings } from "../utils/settings"
 import { useQuery, useMutation } from "~hooks/use-query"
+import { useTranslation } from "~utils/i18n"
 
 interface WordItemProps {
   word: string
@@ -45,6 +46,7 @@ interface WordListProps {
 }
 
 const WordListComponent: React.FC<WordListProps> = ({ filterKey }) => {
+  const { t } = useTranslation(['popup', 'common'])
   const [unstarringWord, setUnstarringWord] = useState<string | null>(null)
 
   // 内联使用 useQuery 获取单词列表
@@ -97,12 +99,12 @@ const WordListComponent: React.FC<WordListProps> = ({ filterKey }) => {
   if (error) {
     return (
       <div className="text-center py-4">
-        <div className="text-sm text-red-500 mb-2">加载失败</div>
+        <div className="text-sm text-red-500 mb-2">{t('common:loadFailed')}</div>
         <button
           onClick={() => refetch()}
           className="text-sm text-text-muted hover:text-text-primary underline"
         >
-          重试
+          {t('common:retry')}
         </button>
       </div>
     )
@@ -115,7 +117,7 @@ const WordListComponent: React.FC<WordListProps> = ({ filterKey }) => {
   if (filteredWords.length === 0) {
     return (
       <div className={clsx("text-[1.2em] font-light italic text-text-muted text-center p-2.5")}>
-        {words.length === 0 ? "No words starred yet." : "No matching words found."}
+        {words.length === 0 ? t('popup:noWordsStarred') : t('popup:noMatchingWords')}
       </div>
     )
   }
@@ -135,6 +137,7 @@ const WordListComponent: React.FC<WordListProps> = ({ filterKey }) => {
 }
 
 function Index() {
+  const { t } = useTranslation('popup')
   const [filterKey, setFilterKey] = useState('')
   const [settings] = useSettings()
 
@@ -169,7 +172,7 @@ function Index() {
             "placeholder:text-text-muted/50"
           )}
           type="input"
-          placeholder="Type to search words"
+          placeholder={t('searchPlaceholder')}
           onChange={(event) => {
             setFilterKey(event.target.value)
           }}
@@ -178,7 +181,7 @@ function Index() {
         <button
           onClick={openOptions}
           className="p-1 rounded hover:bg-main/50 transition-colors text-text-muted hover:text-text-primary"
-          title="Settings"
+          title={t('settings')}
         >
           <SettingsIcon size={20} />
         </button>
@@ -191,5 +194,3 @@ function Index() {
 }
 
 export default Index
-
-

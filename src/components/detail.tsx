@@ -8,6 +8,7 @@ import { sendToBackground } from '@plasmohq/messaging'
 import { useMutation } from '~hooks/use-query'
 import type { Meaning, Phonetic } from '~dictionary'
 import marker from '~contents/marker'
+import { useTranslation } from '~utils/i18n'
 
 interface WordCardProps {
   text: string
@@ -23,6 +24,7 @@ interface WordCardProps {
 }
 
 const Detail: React.FC<WordCardProps> = ({ text, data }) => {
+  const { t } = useTranslation(['detail', 'common'])
   const [isStarred, setIsStarred] = useState(data.starred)
 
   // 内联使用 useMutation 处理收藏/取消收藏
@@ -81,7 +83,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
             isLoading && "cursor-wait"
           )}
           onClick={handleToggleStar}
-          title={isStarred ? "Unstar" : "Star"}
+          title={isStarred ? t('unstar') : t('star')}
           disabled={isLoading}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
@@ -130,7 +132,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
             exit={{ opacity: 0, height: 0 }}
             className="text-xs text-red-500 mb-2 overflow-hidden"
           >
-            操作失败，请重试
+            {t('common:operationFailed')}
           </motion.div>
         )}
       </AnimatePresence>
@@ -162,7 +164,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
                     </div>
                     {def.example && (
                       <div className="text-xs text-text-muted/70 italic pl-3">
-                        e.g. {def.example}
+                        {t('common:example')} {def.example}
                       </div>
                     )}
                   </div>
@@ -172,7 +174,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
           ))
         ) : (
           <div className="text-sm italic text-text-muted/70">
-            No definitions found.
+            {t('common:noDefinitions')}
           </div>
         )}
       </div>
@@ -181,7 +183,3 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
 }
 
 export default Detail
-
-
-
-

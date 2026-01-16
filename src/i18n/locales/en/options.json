@@ -1,0 +1,44 @@
+{
+    "title": "Osmosis Settings",
+    "showTranslations": {
+        "label": "Show Translations",
+        "description": "Display the first definition next to the highlighted word."
+    },
+    "dictionary": {
+        "label": "Dictionary",
+        "description": "Choose the dictionary API for word definitions.",
+        "freeDictionary": "Free Dictionary",
+        "youdao": "Youdao Dictionary"
+    },
+    "highlightStyle": {
+        "label": "Highlight Style",
+        "description": "Choose how the starred words are underlined.",
+        "wavy": "Wavy",
+        "solid": "Solid",
+        "dotted": "Dotted",
+        "dashed": "Dashed",
+        "none": "None"
+    },
+    "theme": {
+        "label": "Theme",
+        "description": "Select the extension theme.",
+        "auto": "Auto",
+        "light": "Light",
+        "dark": "Dark"
+    },
+    "colors": {
+        "title": "Colors",
+        "highlight": {
+            "label": "Highlight Color",
+            "description": "Color of the underline"
+        },
+        "translationBg": {
+            "label": "Translation Background",
+            "description": "Background of the translation pill"
+        },
+        "translationText": {
+            "label": "Translation Text",
+            "description": "Foreground color of text"
+        }
+    }
+}
