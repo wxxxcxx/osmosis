@@ -7,23 +7,23 @@ export const STORAGE_KEY = "extension_settings"
 export type DictionaryProviderType = "freedictionary" | "youdao"
 
 export interface Settings {
-    showTranslation: boolean
+    showComment: boolean
     highlightStyle: "wavy" | "solid" | "dotted" | "dashed" | "none"
     theme: "light" | "dark" | "auto"
     highlightColor: string
-    translationBgColor: string
-    translationTextColor: string
+    commentBgColor: string
+    commentTextColor: string
     /** 默认词典提供者 */
     dictionaryProvider: DictionaryProviderType
 }
 
 export const defaultSettings: Settings = {
-    showTranslation: true,
+    showComment: true,
     highlightStyle: "wavy",
     theme: "auto",
     highlightColor: "#3b82f6",
-    translationBgColor: "#3b82f6",
-    translationTextColor: "#ffffff",
+    commentBgColor: "#3b82f6",
+    commentTextColor: "#ffffff",
     dictionaryProvider: "freedictionary"
 }
 

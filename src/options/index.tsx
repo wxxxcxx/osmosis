@@ -22,8 +22,8 @@ function Options() {
         }
     }, [settings.theme])
 
-    const handleToggleTranslation = () => {
-        setSettings((prev) => ({ ...prev, showTranslation: !prev.showTranslation }))
+    const handleToggleComment = () => {
+        setSettings((prev) => ({ ...prev, showComment: !prev.showComment }))
     }
 
     const handleStyleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -43,20 +43,20 @@ function Options() {
             <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
 
             <div className="space-y-6">
-                {/* Translation Toggle */}
+                {/* Comment Toggle */}
                 <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
                     <div>
-                        <h3 className="font-semibold text-lg">{t('showTranslations.label')}</h3>
+                        <h3 className="font-semibold text-lg">{t('showComments.label')}</h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400">
-                            {t('showTranslations.description')}
+                            {t('showComments.description')}
                         </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
                         <input
                             type="checkbox"
                             className="sr-only peer"
-                            checked={settings.showTranslation}
-                            onChange={handleToggleTranslation}
+                            checked={settings.showComment}
+                            onChange={handleToggleComment}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
@@ -139,27 +139,27 @@ function Options() {
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="font-medium text-sm">{t('colors.translationBg.label')}</span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.translationBg.description')}</p>
+                            <span className="font-medium text-sm">{t('colors.commentBg.label')}</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.commentBg.description')}</p>
                         </div>
                         <input
                             type="color"
                             className="h-8 w-14 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
-                            value={settings.translationBgColor}
-                            onChange={(e) => setSettings((prev) => ({ ...prev, translationBgColor: e.target.value }))}
+                            value={settings.commentBgColor}
+                            onChange={(e) => setSettings((prev) => ({ ...prev, commentBgColor: e.target.value }))}
                         />
                     </div>
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="font-medium text-sm">{t('colors.translationText.label')}</span>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.translationText.description')}</p>
+                            <span className="font-medium text-sm">{t('colors.commentText.label')}</span>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{t('colors.commentText.description')}</p>
                         </div>
                         <input
                             type="color"
                             className="h-8 w-14 cursor-pointer rounded border border-gray-300 dark:border-gray-600 bg-transparent p-0.5"
-                            value={settings.translationTextColor}
-                            onChange={(e) => setSettings((prev) => ({ ...prev, translationTextColor: e.target.value }))}
+                            value={settings.commentTextColor}
+                            onChange={(e) => setSettings((prev) => ({ ...prev, commentTextColor: e.target.value }))}
                         />
                     </div>
                 </div>

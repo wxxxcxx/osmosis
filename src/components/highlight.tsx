@@ -3,6 +3,7 @@ import { clsx } from "clsx"
 import React, { useMemo } from 'react'
 import { useSettings } from "../utils/settings"
 import { useTheme } from "~utils/theme"
+import Comment from "./comment"
 
 export default function Highlight({
   wordKey,
@@ -32,29 +33,6 @@ export default function Highlight({
     }
   }, [settings])
 
-
-  const comment = useMemo(() => {
-    if (!settings.showTranslation) return null
-    return (
-      <span
-        className={clsx(
-          "absolute -top-[0.6em] left-0 w-full rounded-sm",
-          "text-[0.6em] leading-[1em] select-none",
-          "overflow-hidden whitespace-nowrap block",
-          "select-none"
-        )}
-        style={{
-          backgroundColor: settings.translationBgColor,
-          color: settings.translationTextColor
-        }}
-      >
-        <span className="inline-block relative animate-text-swing-scroll px-1">
-          {text}
-        </span>
-      </span>
-    )
-  }, [settings])
-
   return (
     <span className={clsx("inline theme-root", { "dark": isDarkTheme })}>
       <style>{styleText}</style>
@@ -70,9 +48,9 @@ export default function Highlight({
       >
         {text}
       </span>
-      {comment}
+      {settings.showComment && <Comment wordKey={wordKey} />}
     </span>
-
   )
 }
+
 

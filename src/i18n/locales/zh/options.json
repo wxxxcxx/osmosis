@@ -1,8 +1,8 @@
 {
     "title": "Osmosis 设置",
-    "showTranslations": {
-        "label": "显示翻译",
-        "description": "在高亮单词旁边显示第一个释义"
+    "showComments": {
+        "label": "显示评论",
+        "description": "在高亮单词上方显示第一个释义"
     },
     "dictionary": {
         "label": "词典",
@@ -32,12 +32,12 @@
             "label": "高亮颜色",
             "description": "下划线颜色"
         },
-        "translationBg": {
-            "label": "翻译背景",
-            "description": "翻译标签的背景颜色"
+        "commentBg": {
+            "label": "评论背景",
+            "description": "评论标签的背景颜色"
         },
-        "translationText": {
-            "label": "翻译文字",
+        "commentText": {
+            "label": "评论文字",
             "description": "文字的前景颜色"
         }
     }

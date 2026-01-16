@@ -1,8 +1,8 @@
 {
     "title": "Osmosis Settings",
-    "showTranslations": {
-        "label": "Show Translations",
-        "description": "Display the first definition next to the highlighted word."
+    "showComments": {
+        "label": "Show Comments",
+        "description": "Display the first definition above the highlighted word."
     },
     "dictionary": {
         "label": "Dictionary",
@@ -32,12 +32,12 @@
             "label": "Highlight Color",
             "description": "Color of the underline"
         },
-        "translationBg": {
-            "label": "Translation Background",
-            "description": "Background of the translation pill"
+        "commentBg": {
+            "label": "Comment Background",
+            "description": "Background of the comment pill"
         },
-        "translationText": {
-            "label": "Translation Text",
+        "commentText": {
+            "label": "Comment Text",
             "description": "Foreground color of text"
         }
     }
