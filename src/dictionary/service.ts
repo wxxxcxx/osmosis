@@ -3,6 +3,7 @@ import { Storage } from '@plasmohq/storage'
 import type { DictionaryProvider, DictionaryResult, DictionaryQueryOptions } from './types'
 import { YoudaoDictionary, FreeDictionary } from './providers'
 import * as wordUtils from '../utils/word'
+import { STORAGE_KEY, defaultSettings, type Settings } from '../utils/settings'
 
 /**
  * 词典服务
@@ -11,15 +12,35 @@ import * as wordUtils from '../utils/word'
  */
 export class DictionaryService {
     private providers: Map<string, DictionaryProvider> = new Map()
-    private defaultProvider: string = 'freedictionary'
+    private defaultProvider: string = defaultSettings.dictionaryProvider
     private localStorage: Storage
+    private syncStorage: Storage
 
     constructor() {
         this.localStorage = new Storage({ area: 'local' })
+        this.syncStorage = new Storage({ area: 'sync' })
 
         // 注册词典提供者
         this.registerProvider(new FreeDictionary())
         this.registerProvider(new YoudaoDictionary())
+
+        // 从设置中加载默认词典
+        this.loadDefaultProviderFromSettings()
+    }
+
+    /**
+     * 从设置中加载默认词典
+     */
+    private async loadDefaultProviderFromSettings(): Promise<void> {
+        try {
+            const settings = await this.syncStorage.getItem<Settings>(STORAGE_KEY)
+            if (settings?.dictionaryProvider && this.providers.has(settings.dictionaryProvider)) {
+                this.defaultProvider = settings.dictionaryProvider
+                console.log(`[Dictionary] 已加载默认词典: ${this.defaultProvider}`)
+            }
+        } catch (error) {
+            console.error('[Dictionary] 加载设置失败:', error)
+        }
     }
 
     /**
@@ -37,6 +58,13 @@ export class DictionaryService {
             throw new Error(`词典 "${name}" 未注册`)
         }
         this.defaultProvider = name
+    }
+
+    /**
+     * 获取当前默认词典名称
+     */
+    getDefaultProviderName(): string {
+        return this.defaultProvider
     }
 
     /**
@@ -62,6 +90,11 @@ export class DictionaryService {
 
         // 预处理单词
         const normalizedWord = this.normalizeWord(word)
+
+        // 如果没有指定 provider，从设置中重新加载（确保使用最新设置）
+        if (!providerName) {
+            await this.loadDefaultProviderFromSettings()
+        }
 
         // 尝试从缓存获取
         if (useCache) {
@@ -147,3 +180,4 @@ export class DictionaryService {
 
 // 导出单例实例
 export const dictionaryService = new DictionaryService()
+
