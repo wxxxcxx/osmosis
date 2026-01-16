@@ -43,6 +43,12 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
         if (response.code === 0) {
           setIsStarred(action === "star")
           marker.renderer.render()
+
+          // 如果是收藏操作，清除页面选区
+          // 这样可以避免选区残留导致的 UI 状态矛盾
+          if (action === "star") {
+            window.getSelection()?.removeAllRanges()
+          }
         } else {
           console.error("Osmosis: Star mutation failed:", response.message)
         }
