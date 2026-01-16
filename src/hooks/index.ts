@@ -7,3 +7,6 @@ export {
     type TooltipOffset,
     type UseTooltipPositionResult
 } from './use-tooltip-position'
+export { useQuery, useMutation, type UseQueryOptions, type UseMutationOptions } from './use-query'
+
+

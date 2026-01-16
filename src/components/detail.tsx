@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 
 import { sendToBackground } from '@plasmohq/messaging'
 
+import { useMutation } from '~hooks/use-query'
 import marker from '~contents/marker'
 
 interface WordCardProps {
@@ -18,33 +19,36 @@ interface WordCardProps {
 
 const Detail: React.FC<WordCardProps> = ({ text, data }) => {
   const [isStarred, setIsStarred] = useState(data.starred)
-  const [loading, setLoading] = useState(false)
 
-  const handleToggleStar = async () => {
-    if (loading) return
-    setLoading(true)
-
-    const action = isStarred ? 'unstar' : 'star'
-
-    try {
-      const response = await sendToBackground({
+  // 内联使用 useMutation 处理收藏/取消收藏
+  const { mutate: toggleStar, isLoading, error } = useMutation<
+    { code: number; message: string | null },
+    "star" | "unstar"
+  >(
+    async (action) => {
+      return await sendToBackground({
         name: action,
         body: { key: text }
       })
-
-      if (response.code != 0) {
-        console.error(response.message)
-        return
+    },
+    {
+      onSuccess: (response, action) => {
+        if (response.code === 0) {
+          setIsStarred(action === "star")
+          marker.renderer.render()
+        } else {
+          console.error("Osmosis: Star mutation failed:", response.message)
+        }
+      },
+      onError: (err) => {
+        console.error("Osmosis: Star mutation error:", err)
       }
-
-      setIsStarred(!isStarred)
-      // Trigger re-render of highlights on the page
-      marker.renderer.render()
-    } catch (error) {
-      console.error("Osmosis: Failed to toggle star", error)
-    } finally {
-      setLoading(false)
     }
+  )
+
+  const handleToggleStar = async () => {
+    if (isLoading) return
+    await toggleStar(isStarred ? "unstar" : "star")
   }
 
   return (
@@ -59,11 +63,11 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
             "p-1.5 rounded-full transition-all duration-200",
             "hover:bg-main/50 active:scale-90",
             "focus:outline-none focus:ring-2 focus:ring-border-highlight/50",
-            loading && "opacity-50 cursor-wait"
+            isLoading && "opacity-50 cursor-wait"
           )}
           onClick={handleToggleStar}
           title={isStarred ? "Unstar" : "Star"}
-          disabled={loading}
+          disabled={isLoading}
         >
           <Star
             size={20}
@@ -77,9 +81,16 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
         </button>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="text-xs text-red-500 mb-2">
+          操作失败，请重试
+        </div>
+      )}
+
       {/* Content - Scrollable */}
       <div className={clsx(
-        "flex flex-1 min-h-0 flex-col gap-2 pr-1", // 使用 flex-1 使其填满空间并触发滚动
+        "flex flex-1 min-h-0 flex-col gap-2 pr-1",
         "overflow-y-auto overflow-x-hidden scrollbar-thin",
         "scrollbar-thumb-border scrollbar-track-transparent"
       )}>
@@ -103,3 +114,5 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
 }
 
 export default Detail
+
+

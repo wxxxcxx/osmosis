@@ -1,99 +1,137 @@
 import { clsx } from "clsx"
-import React, { useState, type ReactNode, useEffect } from "react"
-import { Settings as SettingsIcon } from "lucide-react"
+import React, { useState, useEffect } from "react"
+import { Settings as SettingsIcon, Loader2 } from "lucide-react"
 
 import "../globals.css"
 
 import { sendToBackground } from "@plasmohq/messaging"
 import { useSettings } from "../utils/settings"
+import { useQuery, useMutation } from "~hooks/use-query"
 
-// ... WordItem and WordList components remain unchanged ...
-
-class WordItem extends React.Component<{
+interface WordItemProps {
   word: string
   onUnstar: (word: string) => void
-}> {
-  unstar = () => {
-    sendToBackground({
-      name: 'unstar',
-      body: {
-        key: this.props.word
+  isUnstarring: boolean
+}
+
+const WordItem: React.FC<WordItemProps> = ({ word, onUnstar, isUnstarring }) => {
+  return (
+    <div
+      className={clsx(
+        "flex flex-row items-center p-2.5 box-border w-full transition-all duration-500 rounded-sm",
+        "hover:bg-main/50 text-text-primary",
+        isUnstarring && "opacity-50"
+      )}
+    >
+      <div className={clsx("flex-grow text-[1.2em] font-light")}>{word}</div>
+      <button
+        className={clsx(
+          "cursor-pointer text-text-muted border-none outline-none text-[1.2em] transition-all duration-500 bg-transparent",
+          "hover:scale-[1.2] hover:rotate-[72deg] hover:text-star-text",
+          "active:scale-[0.8]",
+          isUnstarring && "cursor-wait"
+        )}
+        onClick={() => onUnstar(word)}
+        disabled={isUnstarring}
+      >
+        ★
+      </button>
+    </div>
+  )
+}
+
+interface WordListProps {
+  filterKey: string
+}
+
+const WordListComponent: React.FC<WordListProps> = ({ filterKey }) => {
+  const [unstarringWord, setUnstarringWord] = useState<string | null>(null)
+
+  // 内联使用 useQuery 获取单词列表
+  const { data, isLoading, error, refetch } = useQuery<{ keys: string[] }>(
+    ["word-list"],
+    async () => {
+      return await sendToBackground({ name: "list" })
+    }
+  )
+
+  // 内联使用 useMutation 处理取消收藏
+  const { mutate: unstar } = useMutation<{ code: number; message: string | null }, string>(
+    async (wordKey) => {
+      return await sendToBackground({
+        name: "unstar",
+        body: { key: wordKey }
+      })
+    },
+    {
+      onSuccess: (response) => {
+        setUnstarringWord(null)
+        if (response.code === 0) {
+          refetch()
+        } else {
+          console.error("Osmosis: Unstar failed:", response.message)
+        }
+      },
+      onError: (err) => {
+        setUnstarringWord(null)
+        console.error("Osmosis: Unstar error:", err)
       }
-    }).then((response) => {
-      this.props.onUnstar(this.props.word)
-    })
+    }
+  )
+
+  const handleUnstar = async (word: string) => {
+    setUnstarringWord(word)
+    await unstar(word)
   }
 
-  render(): ReactNode {
+  const words = data?.keys ?? []
+
+  if (isLoading) {
     return (
-      <div
-        className={clsx(
-          "flex flex-row items-center p-2.5 box-border w-full transition-all duration-500 rounded-sm",
-          "hover:bg-main/50 text-text-primary"
-        )}
-      >
-        <div className={clsx("flex-grow text-[1.2em] font-light")}>{this.props.word}</div>
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-6 h-6 animate-spin text-text-muted" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-4">
+        <div className="text-sm text-red-500 mb-2">加载失败</div>
         <button
-          className={clsx(
-            "cursor-pointer text-text-muted border-none outline-none text-[1.2em] transition-all duration-500 bg-transparent",
-            "hover:scale-[1.2] hover:rotate-[72deg] hover:text-star-text",
-            "active:scale-[0.8]"
-          )}
-          onClick={this.unstar}
+          onClick={() => refetch()}
+          className="text-sm text-text-muted hover:text-text-primary underline"
         >
-          ★
+          重试
         </button>
       </div>
     )
   }
-}
 
-class WordList extends React.Component<{
-  filterKey: string
-}> {
-  declare state: {
-    words: string[]
-  }
-  constructor(props) {
-    super(props)
-    this.state = {
-      words: []
-    }
-  }
+  const filteredWords = words.filter((word) =>
+    word.toLowerCase().includes(filterKey.toLowerCase())
+  )
 
-  refresh = () => {
-    sendToBackground({
-      name: 'list'
-    }).then((response) => {
-      this.setState({
-        words: response.keys
-      })
-    })
-  }
-
-  componentDidMount(): void {
-    this.refresh()
-  }
-
-  render(): ReactNode {
-    const list = this.state.words.filter((word) =>
-      word.includes(this.props.filterKey)
-    )
-    const inner =
-      list.length > 0 ? (
-        list.map((word) => {
-          return (
-            <WordItem key={word} word={word} onUnstar={this.refresh}></WordItem>
-          )
-        })
-      ) : (
-        <div className={clsx("text-[1.2em] font-light italic text-text-muted text-center p-2.5")}>No words starred yet.</div>
-      )
-
+  if (filteredWords.length === 0) {
     return (
-      <div className={clsx("mt-5 w-full max-h-[500px] overflow-y-auto")}>{inner}</div>
+      <div className={clsx("text-[1.2em] font-light italic text-text-muted text-center p-2.5")}>
+        {words.length === 0 ? "No words starred yet." : "No matching words found."}
+      </div>
     )
   }
+
+  return (
+    <div className={clsx("mt-5 w-full max-h-[500px] overflow-y-auto")}>
+      {filteredWords.map((word) => (
+        <WordItem
+          key={word}
+          word={word}
+          onUnstar={handleUnstar}
+          isUnstarring={unstarringWord === word}
+        />
+      ))}
+    </div>
+  )
 }
 
 function Index() {
@@ -146,10 +184,12 @@ function Index() {
         </button>
       </div>
       <div>
-        <WordList filterKey={filterKey}></WordList>
+        <WordListComponent filterKey={filterKey} />
       </div>
     </div>
   )
 }
 
 export default Index
+
+

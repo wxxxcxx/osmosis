@@ -22,6 +22,7 @@ function checkWord(word: string): boolean {
 }
 
 const handler: PlasmoMessaging.MessageHandler = async (request, response) => {
+  await new Promise((resolve) => setTimeout(resolve, 1000))
   let queryKey = request.body.key
   try {
     checkWord(queryKey)
