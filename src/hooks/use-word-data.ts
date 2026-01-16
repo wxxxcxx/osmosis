@@ -1,11 +1,16 @@
 import { useQuery } from "./use-query"
 import { sendToBackground } from "@plasmohq/messaging"
+import type { Meaning, Phonetic } from "~dictionary"
 
 export interface WordData {
     code: number
-    definitions: string[]
+    meanings: Meaning[]
     starred: boolean
     message: string | null
+    phonetic?: string
+    phonetics?: Phonetic[]
+    origin?: string
+    source?: string
 }
 
 export interface UseWordDataResult {

@@ -6,15 +6,19 @@ import React, { useState } from 'react'
 import { sendToBackground } from '@plasmohq/messaging'
 
 import { useMutation } from '~hooks/use-query'
+import type { Meaning, Phonetic } from '~dictionary'
 import marker from '~contents/marker'
 
 interface WordCardProps {
   text: string
   data: {
     code: number
-    definitions: string[]
+    meanings: Meaning[]
     starred: boolean
     message: string | null
+    phonetic?: string
+    phonetics?: Phonetic[]
+    origin?: string
   }
 }
 
@@ -52,12 +56,22 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
     await toggleStar(isStarred ? "unstar" : "star")
   }
 
+  // 检查是否有释义
+  const hasMeanings = data.meanings && data.meanings.length > 0
+
   return (
     <div className="flex flex-1 min-h-0 flex-col w-full max-w-full">
       {/* Header */}
       <div className="flex flex-row items-center justify-between gap-4 pb-2 mb-2 border-b border-border">
-        <div className="text-xl font-bold text-text-primary break-words">
-          {text}
+        <div className="flex flex-col">
+          <div className="text-xl font-bold text-text-primary break-words">
+            {text}
+          </div>
+          {data.phonetic && (
+            <div className="text-xs text-text-muted mt-0.5">
+              /{data.phonetic}/
+            </div>
+          )}
         </div>
         <motion.button
           className={clsx(
@@ -123,17 +137,37 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
 
       {/* Content - Scrollable */}
       <div className={clsx(
-        "flex flex-1 min-h-0 flex-col gap-2 pr-1",
+        "flex flex-1 min-h-0 flex-col gap-3 pr-1",
         "overflow-y-auto overflow-x-hidden scrollbar-thin",
         "scrollbar-thumb-border scrollbar-track-transparent"
       )}>
-        {data.definitions && data.definitions.length > 0 ? (
-          data.definitions.map((definition, index) => (
-            <div
-              key={index}
-              className="text-sm leading-relaxed text-text-muted"
-            >
-              {definition}
+        {hasMeanings ? (
+          data.meanings.map((meaning, idx) => (
+            <div key={idx} className="flex flex-col gap-1">
+              {/* 词性标签 */}
+              {meaning.partOfSpeech && (
+                <span className="text-xs font-medium text-main">
+                  {meaning.partOfSpeech}
+                </span>
+              )}
+              {/* 该词性下的释义列表 */}
+              <div className="flex flex-col gap-2 pl-2">
+                {meaning.definitions.map((def, defIdx) => (
+                  <div key={defIdx} className="flex flex-col gap-0.5">
+                    <div className="text-sm leading-relaxed text-text-muted">
+                      {meaning.definitions.length > 1 && (
+                        <span className="text-text-muted/50 mr-1">{defIdx + 1}.</span>
+                      )}
+                      {def.definition}
+                    </div>
+                    {def.example && (
+                      <div className="text-xs text-text-muted/70 italic pl-3">
+                        e.g. {def.example}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           ))
         ) : (
@@ -147,6 +181,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
 }
 
 export default Detail
+
 
 
 
