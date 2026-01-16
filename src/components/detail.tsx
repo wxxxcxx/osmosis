@@ -36,7 +36,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
       return await sendToBackground({
         name: action,
         body: { key: text }
-      })
+      } as any)
     },
     {
       onSuccess: (response, action) => {

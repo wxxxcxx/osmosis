@@ -34,7 +34,7 @@ export default function Highlight({
   }, [settings])
 
   return (
-    <span className={clsx("inline theme-root", { "dark": isDarkTheme })}>
+    <span className={clsx("inline theme-root group/word", { "dark": isDarkTheme })}>
       <style>{styleText}</style>
       <span
         className={clsx(

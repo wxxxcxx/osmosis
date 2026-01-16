@@ -30,7 +30,7 @@ export const Comment: React.FC<CommentProps> = ({ wordKey }) => {
                 "comment-container",
                 "absolute -top-[0.7em] left-0 w-full rounded-sm",
                 "text-[0.6em] leading-[1em] select-none",
-                "overflow-hidden block z-10",
+                "overflow-hidden block",
                 "select-none"
             )}
             style={{

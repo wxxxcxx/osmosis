@@ -175,6 +175,7 @@ export function useTooltipPosition(
 
         switch (position) {
             case 'top':
+                // 增加 gap (从 8px 增加到 20px) 以避开单词上方的 Comment 标签
                 return {
                     ...baseStyles,
                     // fixed 定位下，使用视口高度计算 bottom
