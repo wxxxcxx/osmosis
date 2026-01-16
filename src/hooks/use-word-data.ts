@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useQuery } from "./use-query"
 import { sendToBackground } from "@plasmohq/messaging"
 
 export interface WordData {
@@ -13,6 +13,10 @@ export interface UseWordDataResult {
     wordData: WordData | null
     /** 是否正在加载 */
     loading: boolean
+    /** 是否发生错误 */
+    error: any
+    /** 重新获取数据 */
+    refetch: () => Promise<void>
 }
 
 /**
@@ -23,42 +27,24 @@ export interface UseWordDataResult {
  * @param wordKey - 单词的 key（小写形式）
  */
 export function useWordData(wordKey: string | undefined): UseWordDataResult {
-    const [wordData, setWordData] = useState<WordData | null>(null)
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        if (!wordKey) {
-            setWordData(null)
-            setLoading(false)
-            return
+    const { data: wordData, isLoading: loading, error, refetch } = useQuery<WordData>(
+        ["word-data", wordKey],
+        async () => {
+            if (!wordKey) return null
+            return await sendToBackground({
+                name: "query",
+                body: { key: wordKey }
+            })
+        },
+        {
+            enabled: !!wordKey
         }
-
-        const fetchData = async () => {
-            setLoading(true)
-            try {
-                const response = await sendToBackground({
-                    name: 'query',
-                    body: { key: wordKey }
-                })
-                setWordData(response)
-            } catch (error) {
-                console.error("Osmosis: Failed to fetch word data", error)
-                setWordData({
-                    code: -1,
-                    definitions: [],
-                    starred: false,
-                    message: "Failed to fetch word data"
-                })
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchData()
-    }, [wordKey])
+    )
 
     return {
         wordData,
-        loading
+        loading,
+        error,
+        refetch
     }
 }
