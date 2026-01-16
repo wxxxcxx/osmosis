@@ -235,21 +235,3 @@ export function useTooltipPosition(
         getArrowStyles
     }
 }
-
-/** 动画变体配置 */
-export const tooltipAnimationVariants: Record<TooltipPosition, {
-    initial: { opacity: number; x?: number | string; y?: number | string }
-    animate: { opacity: number; x?: number | string; y?: number | string }
-    exit: { opacity: number; x?: number | string; y?: number | string }
-}> = {
-    top: {
-        initial: { opacity: 0, y: 8 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: 8 },
-    },
-    bottom: {
-        initial: { opacity: 0, y: -8 },
-        animate: { opacity: 1, y: 0 },
-        exit: { opacity: 0, y: -8 },
-    },
-}

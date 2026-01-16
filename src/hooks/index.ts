@@ -2,7 +2,6 @@ export { useAnchorElement, type AnchorData, type UseAnchorElementResult } from '
 export { useWordData, type WordData, type UseWordDataResult } from './use-word-data'
 export {
     useTooltipPosition,
-    tooltipAnimationVariants,
     type TooltipPosition,
     type TooltipOffset,
     type UseTooltipPositionResult

@@ -1,6 +1,5 @@
 import { clsx } from "clsx"
 import { Star } from "lucide-react"
-import { motion, AnimatePresence } from "motion/react"
 import React, { useState } from 'react'
 
 import { sendToBackground } from '@plasmohq/messaging'
@@ -81,67 +80,48 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
             </div>
           )}
         </div>
-        <motion.button
+        <button
           className={clsx(
             "p-1.5 rounded-full",
-            "hover:bg-main/50",
+            "hover:bg-main/50 transition-all duration-200",
+            "hover:scale-110 active:scale-95",
             "focus:outline-none focus:ring-2 focus:ring-border-highlight/50",
             isLoading && "cursor-wait"
           )}
           onClick={handleToggleStar}
           title={isStarred ? t('unstar') : t('star')}
           disabled={isLoading}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={isStarred ? "starred" : "unstarred"}
-              initial={{ scale: 0.5, rotate: -180, opacity: 0 }}
-              animate={{
-                scale: isLoading ? [1, 1.2, 1] : 1,
-                rotate: 0,
-                opacity: isLoading ? 0.5 : 1
-              }}
-              exit={{ scale: 0.5, rotate: 180, opacity: 0 }}
-              transition={{
-                type: "spring",
-                stiffness: 300,
-                damping: 20,
-                scale: isLoading ? {
-                  repeat: Infinity,
-                  duration: 0.6,
-                  ease: "easeInOut"
-                } : undefined
-              }}
-            >
-              <Star
-                size={20}
-                className={clsx(
-                  "transition-colors duration-300",
-                  isStarred
-                    ? "fill-star-fill text-star-text"
-                    : "text-text-muted hover:text-text-primary"
-                )}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </motion.button>
+          <div
+            key={isStarred ? "starred" : "unstarred"}
+            className={clsx(
+              "transition-all duration-300 transform",
+              isLoading ? "animate-pulse opacity-50 scale-110" : "scale-100 opacity-100",
+              // 简单稳定的进入动画
+              "animate-in fade-in zoom-in-50 duration-300"
+            )}
+          >
+            <Star
+              size={20}
+              className={clsx(
+                "transition-colors duration-300",
+                isStarred
+                  ? "fill-star-fill text-star-text"
+                  : "text-text-muted hover:text-text-primary"
+              )}
+            />
+          </div>
+        </button>
       </div>
 
       {/* Error Message */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="text-xs text-red-500 mb-2 overflow-hidden"
-          >
-            {t('common:operationFailed')}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {error && (
+        <div
+          className="text-xs text-red-500 mb-2 overflow-hidden animate-in slide-in-from-top-1 fade-in duration-200"
+        >
+          {t('common:operationFailed')}
+        </div>
+      )}
 
       {/* Content - Scrollable */}
       <div className={clsx(
@@ -154,7 +134,7 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
             <div key={idx} className="flex flex-col gap-1">
               {/* 词性标签 */}
               {meaning.partOfSpeech && (
-                <span className="text-xs font-medium text-main">
+                <span className="text-xs font-medium text-text-muted">
                   {meaning.partOfSpeech}
                 </span>
               )}

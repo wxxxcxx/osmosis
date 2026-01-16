@@ -1,16 +1,12 @@
 import { clsx } from "clsx";
 import styleText from 'data-text:../globals.css';
-import { AnimatePresence, motion } from "motion/react";
 import type { PlasmoCSUIJSXContainer, PlasmoGetOverlayAnchor, PlasmoRender } from "plasmo";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import Detail from "~components/detail";
-import {
-    tooltipAnimationVariants,
-    useAnchorElement,
-    useTooltipPosition,
-    useWordData
-} from "~hooks";
+import { useAnchorElement } from "~hooks/use-anchor-element";
+import { useTooltipPosition } from "~hooks/use-tooltip-position";
+import { useWordData } from "~hooks/use-word-data";
 import { OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
 import { useTranslation } from "~utils/i18n";
 import { useSettings } from "~utils/settings";
@@ -36,12 +32,9 @@ const TooltipOverlay = () => {
     // 计算 tooltip 位置
     const {
         tooltipRef,
-        position,
         getPositionStyles,
         getArrowStyles
     } = useTooltipPosition(anchorElement, [data?.wordKey, wordData, loading])
-
-
 
     // 鼠标移入 tooltip 时保持显示状态
     const handleMouseEnter = () => {
@@ -70,60 +63,48 @@ const TooltipOverlay = () => {
     return (
         <div className={clsx("theme-root", { "dark": isDarkTheme })}>
             <style>{styleText}</style>
-            <AnimatePresence mode="wait">
-                {showTooltip && (
-                    <motion.div
-                        key={data.wordKey}
-                        ref={tooltipRef}
-                        variants={tooltipAnimationVariants[position]}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        layout
-                        style={{
-                            ...getPositionStyles(),
-                            originY: position === 'top' ? 1 : 0,
-                        }}
-                        transition={{
-                            type: "spring",
-                            damping: 25,
-                            stiffness: 350,
-                            mass: 0.5,
-                            layout: { duration: 0.2 }
-                        }}
-                        className={clsx(
-                            "osmosis-tooltip-container",
-                            "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px]",
-                            "flex flex-col",
-                            "bg-surface text-text-primary",
-                            "pointer-events-auto",
-                            "backdrop-blur-md bg-surface/90" // 增强质感
-                        )}
+            {showTooltip && (
+                <div
+                    key={data.wordKey}
+                    ref={tooltipRef}
+                    style={{
+                        ...getPositionStyles(),
+                    }}
+                    className={clsx(
+                        "osmosis-tooltip-container",
+                        "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px]",
+                        "flex flex-col",
+                        "bg-surface text-text-primary",
+                        "pointer-events-auto",
+                        "backdrop-blur-md bg-surface/90",
+                        "transition-all duration-300 ease-out",
+                        // 使用 CSS 类实现简单可靠的动画
+                        "animate-in fade-in zoom-in-95 duration-200"
+                    )}
 
-                        onMouseDown={preventDefault}
-                        onMouseUp={stopPropagation}
-                        onClick={stopPropagation}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        {/* 内容区域 */}
-                        {loading ? (
-                            <div className="flex items-center justify-center py-4">
-                                <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
-                            </div>
-                        ) : wordData?.code === 0 ? (
-                            <Detail text={data?.text || ''} data={wordData} />
-                        ) : (
-                            <div className="text-sm text-text-muted">
-                                {wordData?.message || t('noDefinitions')}
-                            </div>
-                        )}
+                    onMouseDown={preventDefault}
+                    onMouseUp={stopPropagation}
+                    onClick={stopPropagation}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    {/* 内容区域 */}
+                    {loading ? (
+                        <div className="flex items-center justify-center py-4">
+                            <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
+                        </div>
+                    ) : wordData?.code === 0 ? (
+                        <Detail text={data?.text || ''} data={wordData} />
+                    ) : (
+                        <div className="text-sm text-text-muted">
+                            {wordData?.message || t('noDefinitions')}
+                        </div>
+                    )}
 
-                        {/* 箭头 */}
-                        <div style={getArrowStyles()}></div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    {/* 箭头 */}
+                    <div style={getArrowStyles()}></div>
+                </div>
+            )}
         </div>
     );
 }
@@ -131,7 +112,6 @@ const TooltipOverlay = () => {
 export const getOverlayAnchor: PlasmoGetOverlayAnchor = async () => {
     return document.body
 }
-
 
 export const getRootContainer = async () => {
     let rootContainer = document.querySelector(OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG) as HTMLElement
@@ -141,7 +121,6 @@ export const getRootContainer = async () => {
     }
     return rootContainer
 }
-
 
 export const render: PlasmoRender<PlasmoCSUIJSXContainer> = async ({
     createRootContainer
