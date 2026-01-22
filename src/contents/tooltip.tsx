@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion";
 import { clsx } from "clsx";
 import styleText from 'data-text:../globals.css';
 import type { PlasmoCSUIJSXContainer, PlasmoGetOverlayAnchor, PlasmoRender } from "plasmo";
@@ -63,48 +64,51 @@ const TooltipOverlay = () => {
     return (
         <div className={clsx("theme-root", { "dark": isDarkTheme })}>
             <style>{styleText}</style>
-            {showTooltip && (
-                <div
-                    key={data.wordKey}
-                    ref={tooltipRef}
-                    style={{
-                        ...getPositionStyles(),
-                    }}
-                    className={clsx(
-                        "osmosis-tooltip-container",
-                        "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px]",
-                        "flex flex-col",
-                        "bg-surface text-text-primary",
-                        "pointer-events-auto",
-                        "backdrop-blur-md bg-surface/90",
-                        "transition-all duration-300 ease-out",
-                        // 使用 CSS 类实现简单可靠的动画
-                        "animate-in fade-in zoom-in-95 duration-200"
-                    )}
+            <AnimatePresence>
+                {showTooltip && (
+                    <motion.div
+                        key={data.wordKey}
+                        ref={tooltipRef}
+                        initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 5 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        style={{
+                            ...getPositionStyles(),
+                        }}
+                        className={clsx(
+                            "osmosis-tooltip-container",
+                            "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px] z-[99999]",
+                            "flex flex-col",
+                            "bg-surface text-text-primary",
+                            "pointer-events-auto",
+                            "backdrop-blur-md bg-surface/90"
+                        )}
 
-                    onMouseDown={preventDefault}
-                    onMouseUp={stopPropagation}
-                    onClick={stopPropagation}
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    {/* 内容区域 */}
-                    {loading ? (
-                        <div className="flex items-center justify-center py-4">
-                            <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
-                        </div>
-                    ) : wordData?.code === 0 ? (
-                        <Detail text={data?.text || ''} data={wordData} />
-                    ) : (
-                        <div className="text-sm text-text-muted">
-                            {wordData?.message || t('noDefinitions')}
-                        </div>
-                    )}
+                        onMouseDown={preventDefault}
+                        onMouseUp={stopPropagation}
+                        onClick={stopPropagation}
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        {/* 内容区域 */}
+                        {loading ? (
+                            <div className="flex items-center justify-center py-4">
+                                <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
+                            </div>
+                        ) : wordData?.code === 0 ? (
+                            <Detail text={data?.text || ''} data={wordData} />
+                        ) : (
+                            <div className="text-sm text-text-muted">
+                                {wordData?.message || t('noDefinitions')}
+                            </div>
+                        )}
 
-                    {/* 箭头 */}
-                    <div style={getArrowStyles()}></div>
-                </div>
-            )}
+                        {/* 箭头 */}
+                        <div style={getArrowStyles()}></div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

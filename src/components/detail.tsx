@@ -1,3 +1,4 @@
+import { motion, AnimatePresence } from "framer-motion"
 import { clsx } from "clsx"
 import { Star } from "lucide-react"
 import React, { useState } from 'react'
@@ -92,36 +93,45 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
           title={isStarred ? t('unstar') : t('star')}
           disabled={isLoading}
         >
-          <div
-            key={isStarred ? "starred" : "unstarred"}
-            className={clsx(
-              "transition-all duration-300 transform",
-              isLoading ? "animate-pulse opacity-50 scale-110" : "scale-100 opacity-100",
-              // 简单稳定的进入动画
-              "animate-in fade-in zoom-in-50 duration-300"
-            )}
-          >
-            <Star
-              size={20}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isStarred ? "starred" : "unstarred"}
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.2 }}
               className={clsx(
-                "transition-colors duration-300",
-                isStarred
-                  ? "fill-star-fill text-star-text"
-                  : "text-text-muted hover:text-text-primary"
+                "transition-all duration-300 transform",
+                isLoading ? "animate-pulse opacity-50 scale-110" : "scale-100 opacity-100"
               )}
-            />
-          </div>
+            >
+              <Star
+                size={20}
+                className={clsx(
+                  "transition-colors duration-300",
+                  isStarred
+                    ? "fill-star-fill text-star-text"
+                    : "text-text-muted hover:text-text-primary"
+                )}
+              />
+            </motion.div>
+          </AnimatePresence>
         </button>
       </div>
 
       {/* Error Message */}
-      {error && (
-        <div
-          className="text-xs text-red-500 mb-2 overflow-hidden animate-in slide-in-from-top-1 fade-in duration-200"
-        >
-          {t('common:operationFailed')}
-        </div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 8 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            className="text-xs text-red-500 mb-2 overflow-hidden"
+          >
+            {t('common:operationFailed')}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Content - Scrollable */}
       <div className={clsx(
