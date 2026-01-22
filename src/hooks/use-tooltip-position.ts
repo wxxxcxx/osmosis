@@ -63,7 +63,7 @@ function calculateBestPosition(
             offsetX = margin - tooltipLeft
         } else if (tooltipRight > viewportWidth - margin) {
             offsetX = (viewportWidth - margin) - tooltipRight
-        } 
+        }
     } else {
         // 垂直居中对齐 anchor
         const anchorCenterY = anchorRect.top + anchorRect.height / 2

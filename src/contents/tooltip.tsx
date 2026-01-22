@@ -78,7 +78,7 @@ const TooltipOverlay = () => {
                         <motion.div
                             key={data.wordKey}
                             ref={tooltipRef}
-                            layout
+                            layout={'size'}
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
@@ -106,32 +106,31 @@ const TooltipOverlay = () => {
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
                         >
-                            {/* 内容区域：高度由内部动静内容决定 */}
-                            <AnimatePresence initial={false} mode="sync">
-                                {loading ? (
-                                    <div
-                                        key="loading"
-                                        className="w-full flex items-center justify-center py-4"
-                                    >
-                                        <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
-                                    </div>
-                                ) : wordData?.code === 0 ? (
-                                    <div
-                                        key="detail"
 
-                                        className="w-full min-h-0 flex flex-col"
-                                    >
-                                        <Detail text={data?.text || ''} data={wordData} />
-                                    </div>
-                                ) : (
-                                    <div
-                                        key="error"
-                                        className="w-full text-sm text-text-muted"
-                                    >
-                                        {wordData?.message || t('noDefinitions')}
-                                    </div>
-                                )}
-                            </AnimatePresence>
+                            {loading ? (
+                                <div
+                                    key="loading"
+                                    className="w-full flex items-center justify-center py-4"
+                                >
+                                    <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
+                                </div>
+                            ) : wordData?.code === 0 ? (
+                                <div
+                                    key="detail"
+
+                                    className="w-full min-h-0 flex flex-col"
+                                >
+                                    <Detail text={data?.text || ''} data={wordData} />
+                                </div>
+                            ) : (
+                                <div
+                                    key="error"
+                                    className="w-full text-sm text-text-muted"
+                                >
+                                    {wordData?.message || t('noDefinitions')}
+                                </div>
+                            )}
+
 
                             {/* 箭头：使用 absolute 挂载在 motion.div 内部 */}
                             <div style={arrowStyles}></div>
