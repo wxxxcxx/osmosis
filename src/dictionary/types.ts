@@ -39,7 +39,7 @@ export interface Meaning {
 /**
  * 词典查询结果
  */
-export interface DictionaryResult {
+export interface DictionaryQueryResult {
     /** 查询的单词 */
     word: string
     /** 按词性分组的释义列表 */
@@ -70,7 +70,7 @@ export interface DictionaryProvider {
      * @returns 查询结果
      * @throws Error 如果查询失败
      */
-    query(word: string): Promise<DictionaryResult>
+    query(word: string): Promise<DictionaryQueryResult>
 
     /**
      * 检查词典是否可用

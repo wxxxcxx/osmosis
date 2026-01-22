@@ -1,4 +1,4 @@
-import type { DictionaryProvider, DictionaryResult, Meaning, Definition } from '../types'
+import type { DictionaryProvider, DictionaryQueryResult, Meaning, Definition } from '../types'
 
 /**
  * 有道词典提供者
@@ -10,7 +10,7 @@ export class YoudaoDictionary implements DictionaryProvider {
 
     private readonly baseUrl = 'https://dict.youdao.com/jsonapi'
 
-    async query(word: string): Promise<DictionaryResult> {
+    async query(word: string): Promise<DictionaryQueryResult> {
         const url = new URL(this.baseUrl)
         url.searchParams.set('jsonversion', '2')
         url.searchParams.set('dicts', JSON.stringify({ count: 99, dicts: [['ec', 'ce']] }))
@@ -40,7 +40,7 @@ export class YoudaoDictionary implements DictionaryProvider {
      * 有道 API 返回格式示例:
      * trs: [{ pos: "n.", tr: [{ l: { i: ["释义1"] } }] }, ...]
      */
-    private parseResponse(word: string, data: any): DictionaryResult {
+    private parseResponse(word: string, data: any): DictionaryQueryResult {
         const wordData = data?.ec?.word?.[0]
 
         if (!wordData || !wordData.trs || wordData.trs.length === 0) {

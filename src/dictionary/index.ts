@@ -1,7 +1,7 @@
 // 类型定义
 export type {
     DictionaryProvider,
-    DictionaryResult,
+    DictionaryQueryResult as DictionaryResult,
     DictionaryQueryOptions,
     Meaning,
     Definition,

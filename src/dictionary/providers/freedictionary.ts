@@ -1,4 +1,4 @@
-import type { DictionaryProvider, DictionaryResult, Meaning, Definition, Phonetic } from '../types'
+import type { DictionaryProvider, DictionaryQueryResult, Meaning, Definition, Phonetic } from '../types'
 
 /**
  * Free Dictionary API 响应类型定义
@@ -46,7 +46,7 @@ export class FreeDictionary implements DictionaryProvider {
     private readonly baseUrl = 'https://api.dictionaryapi.dev/api/v2/entries'
     private readonly language = 'en'
 
-    async query(word: string): Promise<DictionaryResult> {
+    async query(word: string): Promise<DictionaryQueryResult> {
         const url = `${this.baseUrl}/${this.language}/${encodeURIComponent(word)}`
 
         const response = await fetch(url)
@@ -74,7 +74,7 @@ export class FreeDictionary implements DictionaryProvider {
     /**
      * 解析 Free Dictionary API 响应
      */
-    private parseResponse(word: string, data: FreeDictionaryEntry[]): DictionaryResult {
+    private parseResponse(word: string, data: FreeDictionaryEntry[]): DictionaryQueryResult {
         if (!data || data.length === 0) {
             throw new Error(`未找到单词 "${word}" 的释义`)
         }

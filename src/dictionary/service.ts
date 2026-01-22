@@ -1,6 +1,6 @@
 import { Storage } from '@plasmohq/storage'
 
-import type { DictionaryProvider, DictionaryResult, DictionaryQueryOptions } from './types'
+import type { DictionaryProvider, DictionaryQueryResult, DictionaryQueryOptions } from './types'
 import { YoudaoDictionary, FreeDictionary } from './providers'
 import * as wordUtils from '../utils/word'
 import { STORAGE_KEY, defaultSettings, type Settings } from '../utils/settings'
@@ -85,7 +85,7 @@ export class DictionaryService {
         word: string,
         options: DictionaryQueryOptions = {},
         providerName?: string
-    ): Promise<DictionaryResult> {
+    ): Promise<DictionaryQueryResult> {
         const { useCache = true, saveCache = true } = options
 
         // 预处理单词
@@ -147,16 +147,16 @@ export class DictionaryService {
     /**
      * 从缓存获取
      */
-    private async getFromCache(word: string): Promise<DictionaryResult | null> {
+    private async getFromCache(word: string): Promise<DictionaryQueryResult | null> {
         const cacheKey = this.getCacheKey(word)
-        const cached = await this.localStorage.getItem<DictionaryResult>(cacheKey)
+        const cached = await this.localStorage.getItem<DictionaryQueryResult>(cacheKey)
         return cached || null
     }
 
     /**
      * 保存到缓存
      */
-    private async saveToCache(word: string, result: DictionaryResult): Promise<void> {
+    private async saveToCache(word: string, result: DictionaryQueryResult): Promise<void> {
         const cacheKey = this.getCacheKey(word)
         await this.localStorage.setItem(cacheKey, result)
     }
