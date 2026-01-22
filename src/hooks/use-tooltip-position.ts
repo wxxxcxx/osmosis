@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from "react"
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react"
 
 export type TooltipPosition = 'top' | 'bottom'
 
@@ -14,10 +14,10 @@ export interface UseTooltipPositionResult {
     position: TooltipPosition
     /** 边界修正偏移量 */
     offset: TooltipOffset
-    /** 获取 tooltip 的位置样式 */
-    getPositionStyles: () => React.CSSProperties
-    /** 获取箭头的样式 */
-    getArrowStyles: () => React.CSSProperties
+    /** tooltip 的位置样式 */
+    positionStyles: React.CSSProperties
+    /** 箭头的样式 */
+    arrowStyles: React.CSSProperties
 }
 
 /**
@@ -63,7 +63,7 @@ function calculateBestPosition(
             offsetX = margin - tooltipLeft
         } else if (tooltipRight > viewportWidth - margin) {
             offsetX = (viewportWidth - margin) - tooltipRight
-        }
+        } 
     } else {
         // 垂直居中对齐 anchor
         const anchorCenterY = anchorRect.top + anchorRect.height / 2
@@ -141,7 +141,7 @@ export function useTooltipPosition(
         }
     }, [anchorElement])
 
-    // 计算位置方向（基于稳定尺寸，防止加载时方向跳动）
+    // 计算 position 和 offset
     useLayoutEffect(() => {
         if (!anchorRect) return
 
@@ -156,7 +156,7 @@ export function useTooltipPosition(
     }, [anchorRect, ...deps])
 
     // 位置样式 - 基于视口 (0,0) 计算绝对位置
-    const getPositionStyles = (): React.CSSProperties => {
+    const positionStyles = useMemo((): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {
             position: 'fixed',
         }
@@ -187,10 +187,10 @@ export function useTooltipPosition(
             default:
                 return baseStyles
         }
-    }
+    }, [anchorRect, actualSize.width, position, offset.x])
 
     // 箭头样式
-    const getArrowStyles = (): React.CSSProperties => {
+    const arrowStyles = useMemo((): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {
             position: 'absolute',
             width: 0,
@@ -221,13 +221,13 @@ export function useTooltipPosition(
             default:
                 return baseStyles
         }
-    }
+    }, [position, offset.x])
 
     return {
         tooltipRef,
         position,
         offset,
-        getPositionStyles,
-        getArrowStyles
+        positionStyles,
+        arrowStyles
     }
 }

@@ -33,8 +33,8 @@ const TooltipOverlay = () => {
     // 计算 tooltip 位置
     const {
         tooltipRef,
-        getPositionStyles,
-        getArrowStyles
+        positionStyles,
+        arrowStyles
     } = useTooltipPosition(anchorElement, [data?.wordKey, wordData, loading])
 
     // 鼠标移入 tooltip 时保持显示状态
@@ -68,7 +68,7 @@ const TooltipOverlay = () => {
             {/* 顶层定位容器：负责 fixed 定位，不参与 motion 计算 */}
             <div
                 style={{
-                    ...getPositionStyles(),
+                    ...positionStyles,
                     zIndex: 99999,
                     pointerEvents: 'none'
                 }}
@@ -134,7 +134,7 @@ const TooltipOverlay = () => {
                             </AnimatePresence>
 
                             {/* 箭头：使用 absolute 挂载在 motion.div 内部 */}
-                            <div style={getArrowStyles()}></div>
+                            <div style={arrowStyles}></div>
                         </motion.div>
                     )}
                 </AnimatePresence>
