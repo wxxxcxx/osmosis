@@ -1,15 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
-import { Storage } from '@plasmohq/storage'
 
-import * as utils from '../../utils/word'
-
-interface WordItem {
-  timespan: number
-}
-
-const syncStorage = new Storage({
-  area: 'sync'
-})
+import { vaultService } from '~vault'
+import * as utils from '~utils/word'
 
 function checkWord(word: string): boolean {
   if (!word) {
@@ -22,21 +14,18 @@ function checkWord(word: string): boolean {
 }
 
 const handler: PlasmoMessaging.MessageHandler = async (request, response) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
   let queryKey = request.body.key
   try {
     checkWord(queryKey)
     queryKey = queryKey.toLowerCase()
-    const key = `word.${queryKey}`
-    const value = await syncStorage.getItem<WordItem>(key)
-    if (value) {
-      await syncStorage.removeItem(key)
-    }
+    
+    await vaultService.removeWord(queryKey)
+    
     response.send({
       code: 0,
       word: queryKey
     })
-  } catch (ex) {
+  } catch (ex: any) {
     response.send({
       code: 1,
       word: queryKey,

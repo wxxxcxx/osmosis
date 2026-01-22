@@ -3,7 +3,7 @@ import React from "react"
 
 import "../globals.css"
 
-import { useSettings, type DictionaryProviderType } from "../utils/settings"
+import { useSettings, type DictionaryProviderType, type VaultProviderType } from "../utils/settings"
 import { useTranslation } from "~utils/i18n"
 
 function Options() {
@@ -38,6 +38,10 @@ function Options() {
         setSettings((prev) => ({ ...prev, dictionaryProvider: e.target.value as DictionaryProviderType }))
     }
 
+    const handleVaultChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSettings((prev) => ({ ...prev, vaultProvider: e.target.value as VaultProviderType }))
+    }
+
     return (
         <div className={clsx("p-8 max-w-2xl mx-auto font-sans text-[#333] dark:text-[#ccc]")}>
             <h1 className="text-2xl font-bold mb-6">{t('title')}</h1>
@@ -60,6 +64,24 @@ function Options() {
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
+                </div>
+
+                {/* Vault Provider Select */}
+                <div className="flex items-center justify-between p-4 bg-gray-100 dark:bg-[#444] rounded-lg">
+                    <div>
+                        <h3 className="font-semibold text-lg">{t('vault.label', '存储方式')}</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {t('vault.description', '选择单词本的存储位置')}
+                        </p>
+                    </div>
+                    <select
+                        value={settings.vaultProvider}
+                        onChange={handleVaultChange}
+                        className="bg-white dark:bg-[#555] border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 max-w-[180px]"
+                    >
+                        <option value="sync">{t('vault.sync', 'Chrome Sync (推荐)')}</option>
+                        <option value="local">{t('vault.local', '本地存储')}</option>
+                    </select>
                 </div>
 
                 {/* Dictionary Provider Select */}

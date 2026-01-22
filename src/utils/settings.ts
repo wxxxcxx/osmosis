@@ -6,6 +6,9 @@ export const STORAGE_KEY = "extension_settings"
 /** 可用的词典提供者 */
 export type DictionaryProviderType = "freedictionary" | "youdao"
 
+/** 可用的 Vault 提供者 */
+export type VaultProviderType = "sync" | "local"
+
 export interface Settings {
     showComment: boolean
     highlightStyle: "wavy" | "solid" | "dotted" | "dashed" | "none"
@@ -15,6 +18,8 @@ export interface Settings {
     commentTextColor: string
     /** 默认词典提供者 */
     dictionaryProvider: DictionaryProviderType
+    /** 单词本存储提供者 */
+    vaultProvider: VaultProviderType
 }
 
 export const defaultSettings: Settings = {
@@ -24,7 +29,8 @@ export const defaultSettings: Settings = {
     highlightColor: "#3b82f6",
     commentBgColor: "#3b82f6",
     commentTextColor: "#ffffff",
-    dictionaryProvider: "freedictionary"
+    dictionaryProvider: "freedictionary",
+    vaultProvider: "sync"
 }
 
 export const storage = new Storage()

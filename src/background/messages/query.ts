@@ -1,12 +1,8 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
-import { Storage } from '@plasmohq/storage'
 
 import { dictionaryService } from '~dictionary'
+import { vaultService } from '~vault'
 import * as utils from '~utils/word'
-
-const syncStorage = new Storage({
-  area: 'sync'
-})
 
 function checkWord(word: string): boolean {
   if (!word) {
@@ -19,7 +15,7 @@ function checkWord(word: string): boolean {
 }
 
 const handler: PlasmoMessaging.MessageHandler = async (request, response) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  // await new Promise((resolve) => setTimeout(resolve, 1000))
   let queryKey = request.body.key
 
   try {
@@ -27,11 +23,11 @@ const handler: PlasmoMessaging.MessageHandler = async (request, response) => {
     queryKey = queryKey.toLowerCase()
 
     // 使用词典服务查询
-    const result = await dictionaryService.query(queryKey)
-
-    // 检查是否已收藏
-    const key = `word.${queryKey}`
-    const starred = (await syncStorage.getItem(key)) != null
+    // 注意：dictionaryService 和 vaultService 可以并行执行以优化性能
+    const [result, starred] = await Promise.all([
+        dictionaryService.query(queryKey),
+        vaultService.hasWord(queryKey)
+    ])
 
     response.send({
       code: 0,
@@ -41,7 +37,7 @@ const handler: PlasmoMessaging.MessageHandler = async (request, response) => {
       phonetic: result.phonetic,
       source: result.source
     })
-  } catch (ex) {
+  } catch (ex: any) {
     response.send({
       code: 1,
       key: queryKey,
@@ -51,4 +47,3 @@ const handler: PlasmoMessaging.MessageHandler = async (request, response) => {
 }
 
 export default handler
-

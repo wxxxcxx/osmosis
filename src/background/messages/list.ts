@@ -1,19 +1,9 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
-import { Storage } from '@plasmohq/storage'
-
-const syncStorage = new Storage({
-  area: 'sync'
-})
+import { vaultService } from '~vault'
 
 const handler: PlasmoMessaging.MessageHandler = async (_request, response) => {
-  const items = await syncStorage.getAll()
-  const keys = []
-  for (const key in items) {
-    if (key.startsWith('word.')) {
-      const queryKey = key.substring('word.'.length)
-      keys.push(queryKey)
-    }
-  }
+  const words = await vaultService.getWords()
+  const keys = words.map(item => item.word)
   response.send({
     code: 0,
     keys: keys
