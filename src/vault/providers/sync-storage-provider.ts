@@ -9,7 +9,7 @@ const MAX_BYTES_PER_ITEM = 7000
 
 type ChunkData = Record<string, number>
 
-export class ChromeSyncProvider implements VaultProvider {
+export class SyncStorageProvider implements VaultProvider {
     private limiter = new RateLimiter()
     private storage = new Storage({
         area: "sync"

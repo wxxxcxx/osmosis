@@ -1,6 +1,6 @@
 import type { VaultProvider, WordItem } from "./types"
-import { ChromeSyncProvider } from "./providers/chrome-sync"
-import { LocalStorageProvider } from "./providers/local"
+import { SyncStorageProvider } from "./providers/sync-storage-provider"
+import { LocalStorageProvider } from "./providers/local-storage-provider"
 import { storage as settingsStorage, defaultSettings, type VaultProviderType, STORAGE_KEY } from "~utils/settings"
 
 /**
@@ -9,7 +9,7 @@ import { storage as settingsStorage, defaultSettings, type VaultProviderType, ST
  * 管理用户的生词本，支持同步存储。
  */
 export class VaultService {
-    private syncProvider = new ChromeSyncProvider()
+    private syncProvider = new SyncStorageProvider()
     private localProvider = new LocalStorageProvider()
 
     /**
