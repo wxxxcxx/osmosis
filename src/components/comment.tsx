@@ -1,6 +1,6 @@
 import { clsx } from "clsx"
 import React, { useMemo } from 'react'
-import { useWordData } from "~hooks/use-word-data"
+import { useWordQuery } from "~hooks/use-word-query"
 import { useSettings } from "~utils/settings"
 import Marquee from "./ui/marquee"
 
@@ -10,7 +10,7 @@ interface CommentProps {
 
 export const Comment: React.FC<CommentProps> = ({ wordKey }) => {
     const [settings] = useSettings()
-    const { wordData, loading } = useWordData(wordKey)
+    const { data: wordData, loading } = useWordQuery(wordKey)
 
     // 获取第一个释义
     const firstDefinition = useMemo(() => {
