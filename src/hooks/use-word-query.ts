@@ -1,6 +1,6 @@
 import { useQuery } from "./use-query"
 import { sendToBackground } from "@plasmohq/messaging"
-import type { Meaning, Phonetic } from "~dictionary"
+import type { Meaning, Phonetic } from "~services/dictionary"
 
 export interface Word {
     code: number

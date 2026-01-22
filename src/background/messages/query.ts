@@ -1,7 +1,7 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
 
-import { dictionaryService } from '~dictionary'
-import { vaultService } from '~vault'
+import { dictionaryService } from '~services/dictionary'
+import { vaultService } from '~services/vault'
 import * as utils from '~utils/word'
 
 function checkWord(word: string): boolean {

@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import { sendToBackground } from '@plasmohq/messaging'
 
 import { useMutation } from '~hooks/use-query'
-import type { Meaning, Phonetic } from '~dictionary'
+import type { Meaning, Phonetic } from '~services/dictionary'
 import marker from '~contents/marker'
 import { useTranslation } from '~utils/i18n'
 

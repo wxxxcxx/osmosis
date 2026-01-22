@@ -1,5 +1,5 @@
 import type { PlasmoMessaging } from '@plasmohq/messaging'
-import { vaultService } from '~vault'
+import { vaultService } from '~services/vault'
 
 const handler: PlasmoMessaging.MessageHandler = async (_request, response) => {
   const words = await vaultService.getWords()
