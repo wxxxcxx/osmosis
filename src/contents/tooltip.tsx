@@ -64,51 +64,81 @@ const TooltipOverlay = () => {
     return (
         <div className={clsx("theme-root", { "dark": isDarkTheme })}>
             <style>{styleText}</style>
-            <AnimatePresence>
-                {showTooltip && (
-                    <motion.div
-                        key={data.wordKey}
-                        ref={tooltipRef}
-                        initial={{ opacity: 0, scale: 0.95, y: 5 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 5 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        style={{
-                            ...getPositionStyles(),
-                        }}
-                        className={clsx(
-                            "osmosis-tooltip-container",
-                            "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px] z-[99999]",
-                            "flex flex-col",
-                            "bg-surface text-text-primary",
-                            "pointer-events-auto",
-                            "backdrop-blur-md bg-surface/90"
-                        )}
 
-                        onMouseDown={preventDefault}
-                        onMouseUp={stopPropagation}
-                        onClick={stopPropagation}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
-                    >
-                        {/* 内容区域 */}
-                        {loading ? (
-                            <div className="flex items-center justify-center py-4">
-                                <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
-                            </div>
-                        ) : wordData?.code === 0 ? (
-                            <Detail text={data?.text || ''} data={wordData} />
-                        ) : (
-                            <div className="text-sm text-text-muted">
-                                {wordData?.message || t('noDefinitions')}
-                            </div>
-                        )}
+            {/* 顶层定位容器：负责 fixed 定位，不参与 motion 计算 */}
+            <div
+                style={{
+                    ...getPositionStyles(),
+                    zIndex: 99999,
+                    pointerEvents: 'none'
+                }}
+            >
+                <AnimatePresence>
+                    {showTooltip && (
+                        <motion.div
+                            key={data.wordKey}
+                            ref={tooltipRef}
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{
+                                duration: 0.4,
+                                ease: [0.23, 1, 0.32, 1],
+                                layout: {
+                                    type: "spring",
+                                    stiffness: 200,
+                                    damping: 25
+                                }
+                            }}
+                            className={clsx(
+                                "osmosis-tooltip-container",
+                                "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px]",
+                                "flex flex-col relative",
+                                "bg-surface text-text-primary",
+                                "pointer-events-auto",
+                                "backdrop-blur-md bg-surface/90"
+                            )}
 
-                        {/* 箭头 */}
-                        <div style={getArrowStyles()}></div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            onMouseDown={preventDefault}
+                            onMouseUp={stopPropagation}
+                            onClick={stopPropagation}
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            {/* 内容区域：高度由内部动静内容决定 */}
+                            <AnimatePresence initial={false} mode="sync">
+                                {loading ? (
+                                    <div
+                                        key="loading"
+                                        className="w-full flex items-center justify-center py-4"
+                                    >
+                                        <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
+                                    </div>
+                                ) : wordData?.code === 0 ? (
+                                    <div
+                                        key="detail"
+
+                                        className="w-full min-h-0 flex flex-col"
+                                    >
+                                        <Detail text={data?.text || ''} data={wordData} />
+                                    </div>
+                                ) : (
+                                    <div
+                                        key="error"
+                                        className="w-full text-sm text-text-muted"
+                                    >
+                                        {wordData?.message || t('noDefinitions')}
+                                    </div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* 箭头：使用 absolute 挂载在 motion.div 内部 */}
+                            <div style={getArrowStyles()}></div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 }

@@ -164,10 +164,6 @@ export function useTooltipPosition(
         if (!anchorRect) return baseStyles
 
         const tooltipWidth = actualSize.width
-        const tooltipHeight = actualSize.height
-
-        const scrollY = window.scrollY
-        const scrollX = window.scrollX
         const gap = 8
 
         const anchorCenterX = anchorRect.left + anchorRect.width / 2
