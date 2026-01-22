@@ -11,7 +11,7 @@ export interface UseAnchorElementResult {
     /** 当前的 anchor 元素 */
     anchorElement: HTMLElement | null
     /** 从 anchor 元素解析的数据 */
-    data: AnchorData | null
+    anchorData: AnchorData | null
     /** 是否为选区元素 */
     isSelection: boolean
 }
@@ -65,7 +65,7 @@ export function useAnchorElement(): UseAnchorElementResult {
     }, [])
 
     // 从 anchor 元素获取数据
-    const data = useMemo<AnchorData | null>(() => {
+    const anchorData = useMemo<AnchorData | null>(() => {
         console.log(anchorElement)
         if (!anchorElement) return null
         const result = {
@@ -82,7 +82,7 @@ export function useAnchorElement(): UseAnchorElementResult {
 
     return {
         anchorElement,
-        data,
+        anchorData,
         isSelection
     }
 }

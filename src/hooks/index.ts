@@ -1,5 +1,5 @@
 export { useAnchorElement, type AnchorData, type UseAnchorElementResult } from './use-anchor-element'
-export { useWordData, type WordData, type UseWordDataResult } from './use-word-data'
+export { useWordQuery as useWordData, type Word as WordData, type UseWordQueryResult as UseWordDataResult } from './use-word-query'
 export {
     useTooltipPosition,
     type TooltipPosition,

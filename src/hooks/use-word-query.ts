@@ -2,7 +2,7 @@ import { useQuery } from "./use-query"
 import { sendToBackground } from "@plasmohq/messaging"
 import type { Meaning, Phonetic } from "~dictionary"
 
-export interface WordData {
+export interface Word {
     code: number
     meanings: Meaning[]
     starred: boolean
@@ -13,9 +13,9 @@ export interface WordData {
     source?: string
 }
 
-export interface UseWordDataResult {
+export interface UseWordQueryResult {
     /** 单词数据 */
-    wordData: WordData | null
+    data: Word | null
     /** 是否正在加载 */
     loading: boolean
     /** 是否发生错误 */
@@ -31,8 +31,8 @@ export interface UseWordDataResult {
  * 
  * @param wordKey - 单词的 key（小写形式）
  */
-export function useWordData(wordKey: string | undefined): UseWordDataResult {
-    const { data: wordData, isLoading: loading, error, refetch } = useQuery<WordData>(
+export function useWordQuery(wordKey: string | undefined): UseWordQueryResult {
+    const { data: wordData, isLoading: loading, error, refetch } = useQuery<Word>(
         ["word-data", wordKey],
         async () => {
             if (!wordKey) return null
@@ -47,7 +47,7 @@ export function useWordData(wordKey: string | undefined): UseWordDataResult {
     )
 
     return {
-        wordData,
+        data: wordData,
         loading,
         error,
         refetch

@@ -7,7 +7,7 @@ import { createRoot } from "react-dom/client";
 import Detail from "~components/detail";
 import { useAnchorElement } from "~hooks/use-anchor-element";
 import { useTooltipPosition } from "~hooks/use-tooltip-position";
-import { useWordData } from "~hooks/use-word-data";
+import { useWordQuery } from "~hooks/use-word-query";
 import { OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
 import { useTranslation } from "~utils/i18n";
 import { useSettings } from "~utils/settings";
@@ -25,17 +25,17 @@ const TooltipOverlay = () => {
     const [settings] = useSettings()
 
     // 获取 anchor 元素和相关数据
-    const { anchorElement, data, isSelection } = useAnchorElement()
+    const { anchorElement, anchorData, isSelection } = useAnchorElement()
 
     // 获取单词数据
-    const { wordData, loading } = useWordData(data?.wordKey)
+    const { data, loading } = useWordQuery(anchorData?.wordKey)
 
     // 计算 tooltip 位置
     const {
         tooltipRef,
         positionStyles,
         arrowStyles
-    } = useTooltipPosition(anchorElement, [data?.wordKey, wordData, loading])
+    } = useTooltipPosition(anchorElement, [anchorData?.wordKey, data, loading])
 
     // 鼠标移入 tooltip 时保持显示状态
     const handleMouseEnter = () => {
@@ -59,7 +59,7 @@ const TooltipOverlay = () => {
     }
 
     // 不满足显示条件时返回 null
-    const showTooltip = !!(settings && data?.wordKey);
+    const showTooltip = !!(settings && anchorData?.wordKey);
 
     return (
         <div className={clsx("theme-root", { "dark": isDarkTheme })}>
@@ -73,10 +73,10 @@ const TooltipOverlay = () => {
                     pointerEvents: 'none'
                 }}
             >
-                <AnimatePresence mode="popLayout">
+                <AnimatePresence mode="wait">
                     {showTooltip && (
                         <motion.div
-                            key={data.wordKey}
+                            key={anchorData.wordKey}
                             ref={tooltipRef}
                             layout={'size'}
                             initial={{ opacity: 0, scale: 0.95 }}
@@ -114,20 +114,20 @@ const TooltipOverlay = () => {
                                 >
                                     <div className="w-6 h-6 border-2 border-border border-t-main rounded-full animate-spin"></div>
                                 </div>
-                            ) : wordData?.code === 0 ? (
+                            ) : data?.code === 0 ? (
                                 <div
                                     key="detail"
 
                                     className="w-full min-h-0 flex flex-col"
                                 >
-                                    <Detail text={data?.text || ''} data={wordData} />
+                                    <Detail text={anchorData?.text || ''} data={data} />
                                 </div>
                             ) : (
                                 <div
                                     key="error"
                                     className="w-full text-sm text-text-muted"
                                 >
-                                    {wordData?.message || t('noDefinitions')}
+                                    {data?.message || t('noDefinitions')}
                                 </div>
                             )}
 
