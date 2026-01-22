@@ -1,4 +1,4 @@
 export * from './types'
 export * from './service'
-export { SyncStorageProvider } from './providers/sync-storage-provider'
-export { LocalStorageProvider } from './providers/local-storage-provider'
+export { SyncStorageProvider } from './providers/sync-storage'
+export { LocalStorageProvider } from './providers/local-storage'

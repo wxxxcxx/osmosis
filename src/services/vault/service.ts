@@ -1,6 +1,6 @@
 import type { VaultProvider, WordItem } from "./types"
-import { SyncStorageProvider } from "./providers/sync-storage-provider"
-import { LocalStorageProvider } from "./providers/local-storage-provider"
+import { SyncStorageProvider } from "./providers/sync-storage"
+import { LocalStorageProvider } from "./providers/local-storage"
 import { storage as settingsStorage, defaultSettings, type VaultProviderType, STORAGE_KEY } from "~utils/settings"
 
 /**
@@ -19,7 +19,7 @@ export class VaultService {
         // 读取设置
         const settings = await settingsStorage.getItem<any>(STORAGE_KEY)
         const type: VaultProviderType = settings?.vaultProvider || defaultSettings.vaultProvider
-        
+
         return type === "local" ? this.localProvider : this.syncProvider
     }
 
