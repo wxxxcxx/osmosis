@@ -73,7 +73,7 @@ const TooltipOverlay = () => {
                     pointerEvents: 'none'
                 }}
             >
-                <AnimatePresence>
+                <AnimatePresence mode="popLayout">
                     {showTooltip && (
                         <motion.div
                             key={data.wordKey}
