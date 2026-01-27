@@ -6,29 +6,33 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Semantic Token Mapping
-        main: "var(--color-bg-main)",
-        surface: "var(--color-bg-surface)",
-        input: "var(--color-bg-input)",
+        // Semantic Token Mapping using HSL
+        main: "hsl(var(--main))",
+        "main-soft": "hsl(var(--main-soft))",
+        surface: "hsl(var(--bg-surface))",
+        "surface-secondary": "hsl(var(--bg-surface-secondary))",
 
-        "text-primary": "var(--color-text-main)",
-        "text-muted": "var(--color-text-muted)",
-        "text-inverted": "var(--color-text-inverted)",
+        "text-primary": "hsl(var(--text-primary))",
+        "text-muted": "hsl(var(--text-muted))",
 
-        border: "var(--color-border-main)",
-        "border-highlight": "var(--color-border-highlight)",
+        border: "hsl(var(--border))",
+        "border-highlight": "hsl(var(--border-highlight))",
 
-        "star-fill": "var(--color-star-fill)",
-        "star-text": "var(--color-star-text)"
+        "star-fill": "hsl(var(--star-fill))",
+        "star-text": "hsl(var(--star-text))"
       },
       keyframes: {
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' }
+        },
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' }
         }
       },
       animation: {
         marquee: 'marquee var(--duration) linear infinite',
+        shimmer: 'shimmer 2s infinite',
       }
     }
   },

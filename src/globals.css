@@ -3,41 +3,70 @@
 @tailwind utilities;
 
 @layer base {
-  :root, .theme-root {
-    /* Light Mode Palette */
-    --color-bg-main: #f8f9fa;
-    --color-bg-surface: #eeeeee;
-    --color-bg-input: #ffffff;
+  :root {
+    /* Modern Indigo Palette - Light */
+    --bg-main: 210 40% 98%;      /* #f8fafc */
+    --bg-surface: 0 0% 100%;    /* #ffffff */
+    --bg-surface-secondary: 210 40% 96%; /* #f1f5f9 */
     
-    --color-text-main: #333333;
-    --color-text-muted: #666666;
-    --color-text-inverted: #ffffff;
+    --text-primary: 215 25% 15%;    /* #1e293b */
+    --text-muted: 215 15% 45%;   /* #64748b */
 
-    --color-border-main: #e5e7eb;
-    --color-border-highlight: #3b82f6;
+    --border: 220 13% 91%;  /* #e2e8f0 */
+    --border-highlight: 245 58% 51%; /* Indigo 600 */
 
-    --color-star-fill: #fbbf24; /* yellow-400 */
-    --color-star-text: #f59e0b; /* yellow-500 */
+    --star-fill: 45 93% 47%;
+    --star-text: 45 93% 30%;
+
+    --main: 245 58% 51%;      /* Indigo 600 */
+    --main-soft: 245 58% 95%;
   }
 
   .dark {
-    /* Dark Mode Palette */
-    --color-bg-main: #333333;
-    --color-bg-surface: #444444;
-    --color-bg-input: #555555;
+    /* Modern Slate Palette - Dark */
+    --bg-main: 224 71% 4%;       /* Deep Slate - #020617 */
+    --bg-surface: 222 47% 7%;    /* #0f172a */
+    --bg-surface-secondary: 215 25% 12%; /* #1e293b */
 
-    --color-text-main: #eeeeee;
-    --color-text-muted: #aaaaaa;
-    --color-text-inverted: #000000;
+    --text-primary: 210 40% 98%;    /* #f8fafc */
+    --text-muted: 215 20% 65%;   /* #94a3b8 */
 
-    --color-border-main: #555555;
-    --color-border-highlight: #60a5fa;
+    --border: 215 25% 15%;  /* #1e293b */
+    --border-highlight: 245 58% 60%;
 
-    --color-star-fill: #fbbf24;
-    --color-star-text: #f59e0b;
+    --star-fill: 45 93% 58%;
+    --star-text: 45 93% 80%;
+
+    --main: 245 58% 60%;
+    --main-soft: 245 40% 15%;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsla(var(--text-muted), 0.2);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsla(var(--text-muted), 0.4);
   }
 
   body {
-    @apply bg-main text-text-primary transition-colors duration-300;
+    background-color: hsl(var(--bg-main));
+    color: hsl(var(--text-primary));
+    @apply transition-colors duration-300 antialiased;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply border border-white/10 dark:border-white/5;
+    background: linear-gradient(135deg, hsla(var(--bg-surface), 0.7) 0%, hsla(var(--bg-surface), 0.4) 100%);
+    backdrop-filter: blur(12px);
   }
 }

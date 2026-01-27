@@ -41,7 +41,7 @@ export function useQuery<TData = any>(
         }
     }, [...queryKey, enabled]);
 
-    return { data, isLoading, error, refetch: fetchData };
+    return { data, isLoading, error, refetch: fetchData, setData };
 }
 
 export interface UseMutationOptions<TData, TVariables> {

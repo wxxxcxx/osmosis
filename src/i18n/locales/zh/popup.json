@@ -2,5 +2,10 @@
     "searchPlaceholder": "搜索单词",
     "noWordsStarred": "还没有收藏单词",
     "noMatchingWords": "未找到匹配的单词",
-    "settings": "设置"
+    "settings": "设置",
+    "tabSearch": "查询",
+    "tabWordBook": "单词本",
+    "tabSettings": "设置",
+    "historyTitle": "最近查询",
+    "clearHistory": "清空"
 }

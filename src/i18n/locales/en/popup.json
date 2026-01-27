@@ -2,5 +2,10 @@
     "searchPlaceholder": "Type to search words",
     "noWordsStarred": "No words starred yet.",
     "noMatchingWords": "No matching words found.",
-    "settings": "Settings"
+    "settings": "Settings",
+    "tabSearch": "Search",
+    "tabWordBook": "Library",
+    "tabSettings": "Settings",
+    "historyTitle": "Recently Searched",
+    "clearHistory": "Clear"
 }
