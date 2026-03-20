@@ -34,7 +34,8 @@ const TooltipOverlay = () => {
     const {
         tooltipRef,
         positionStyles,
-        arrowStyles
+        arrowStyles,
+        position
     } = useTooltipPosition(anchorElement, [anchorData?.wordKey, data, loading])
 
     // 鼠标移入 tooltip 时保持显示状态
@@ -70,7 +71,7 @@ const TooltipOverlay = () => {
                 style={{
                     ...positionStyles,
                     zIndex: 99999,
-                    pointerEvents: 'none'
+                    pointerEvents: 'none',
                 }}
             >
                 <AnimatePresence mode="wait">
@@ -78,10 +79,14 @@ const TooltipOverlay = () => {
                         <motion.div
                             key={anchorData.wordKey}
                             ref={tooltipRef}
-                            layout={'size'}
+                            layout={'preserve-aspect'}
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
+                            style={{
+                                originX: 0.5,
+                                originY: position === 'top' ? 1 : 0
+                            }}
                             transition={{
                                 duration: 0.4,
                                 ease: [0.23, 1, 0.32, 1],
@@ -92,14 +97,13 @@ const TooltipOverlay = () => {
                                 }
                             }}
                             className={clsx(
-                                "osmosis-tooltip-container",
+                                "osmosis-tooltip-container ",
                                 "p-4 rounded-lg shadow-lg w-[300px] max-h-[300px]",
                                 "flex flex-col relative",
                                 "bg-surface text-text-primary",
                                 "pointer-events-auto",
                                 "backdrop-blur-md bg-surface/90"
                             )}
-
                             onMouseDown={preventDefault}
                             onMouseUp={stopPropagation}
                             onClick={stopPropagation}

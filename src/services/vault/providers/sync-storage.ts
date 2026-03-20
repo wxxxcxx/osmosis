@@ -19,7 +19,7 @@ export class SyncStorageProvider implements VaultProvider {
      * 根据单词计算所属的 Bucket Key
      */
     private getBucketKey(word: string): string {
-        const hash = hashString(word)
+        const hash = hashString(word.trim().toLowerCase())
         const index = hash % BUCKET_COUNT
         return `${CHUNK_PREFIX}${index}`
     }
