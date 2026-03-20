@@ -126,8 +126,6 @@ export function useTooltipPosition(
         const updateRect = () => {
             if (anchorElement) {
                 setAnchorRect(anchorElement.getBoundingClientRect())
-            } else {
-                setAnchorRect(null)
             }
         }
 

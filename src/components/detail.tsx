@@ -21,9 +21,10 @@ interface WordCardProps {
     phonetics?: Phonetic[]
     origin?: string
   }
+  scrollable?: boolean
 }
 
-const Detail: React.FC<WordCardProps> = ({ text, data }) => {
+const Detail: React.FC<WordCardProps> = ({ text, data, scrollable = true }) => {
   const { t } = useTranslation(['detail', 'common'])
   const [isStarred, setIsStarred] = useState(data.starred)
 
@@ -136,8 +137,9 @@ const Detail: React.FC<WordCardProps> = ({ text, data }) => {
       {/* Content - Scrollable */}
       <div className={clsx(
         "flex flex-1 min-h-0 flex-col gap-3 pr-1",
-        "overflow-y-auto overflow-x-hidden scrollbar-thin",
-        "scrollbar-thumb-border scrollbar-track-transparent"
+        scrollable
+          ? "overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
+          : "overflow-visible"
       )}>
         {hasMeanings ? (
           data.meanings.map((meaning, idx) => (
