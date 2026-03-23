@@ -1,5 +1,6 @@
 import { sendToBackground } from '@plasmohq/messaging'
-import { OSMOSIS_STARRED_WORD_TAG, TOOLTIP_SHOW_CLASS, TOOLTIP_CONTENT_CLASS } from '~utils/constants'
+import { OSMOSIS_STARRED_WORD_TAG, TOOLTIP_CONTENT_CLASS } from '~utils/constants'
+import { scheduleTooltipHide, showTooltipForAnchor } from '~utils/tooltip-anchor'
 
 /**
  * 从文本中匹配所有英文单词，并返回它们的位置信息。
@@ -166,17 +167,12 @@ class NodeRender {
 
                 // 鼠标移入单词时，显示tooltip
                 xWordNode.addEventListener('mouseenter', () => {
-                    // 移除其他单词的tooltip显示状态
-                    document.querySelectorAll(`${OSMOSIS_STARRED_WORD_TAG}.${TOOLTIP_SHOW_CLASS}`).forEach((item) => {
-                        item.classList.remove(TOOLTIP_SHOW_CLASS)
-                    })
-                    // 为当前单词添加tooltip显示状态
-                    xWordNode.classList.add(TOOLTIP_SHOW_CLASS)
+                    showTooltipForAnchor(xWordNode)
                 })
 
-                // 鼠标移出单词时，隐藏tooltip
+                // 鼠标移出单词时，延迟隐藏，避免移动到 tooltip 的过程中闪断
                 xWordNode.addEventListener('mouseleave', () => {
-                    xWordNode.classList.remove(TOOLTIP_SHOW_CLASS)
+                    scheduleTooltipHide(xWordNode)
                 })
 
                 // 用锚点元素替换原来的文本节点

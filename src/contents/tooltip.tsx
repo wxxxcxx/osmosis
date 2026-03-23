@@ -8,7 +8,8 @@ import Detail from "~components/detail";
 import { useAnchorElement } from "~hooks/use-anchor-element";
 import { useTooltipPosition } from "~hooks/use-tooltip-position";
 import { useWordQuery } from "~hooks/use-word-query";
-import { OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG, TOOLTIP_SHOW_CLASS } from "~utils/constants";
+import { OSMOSIS_TOOLTIP_CONTAINER_ROOT_TAG } from "~utils/constants";
+import { scheduleTooltipHide, showTooltipForAnchor } from "~utils/tooltip-anchor";
 import { useTranslation } from "~utils/i18n";
 import { useSettings } from "~utils/settings";
 import { useTheme } from "~utils/theme";
@@ -41,14 +42,14 @@ const TooltipOverlay = () => {
     // 鼠标移入 tooltip 时保持显示状态
     const handleMouseEnter = () => {
         if (!isSelection && anchorElement) {
-            anchorElement.classList.add(TOOLTIP_SHOW_CLASS)
+            showTooltipForAnchor(anchorElement)
         }
     }
 
     // 鼠标移出 tooltip 时隐藏
     const handleMouseLeave = () => {
         if (!isSelection && anchorElement) {
-            anchorElement.classList.remove(TOOLTIP_SHOW_CLASS)
+            scheduleTooltipHide(anchorElement)
         }
     }
 

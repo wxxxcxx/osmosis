@@ -66,15 +66,12 @@ export function useAnchorElement(): UseAnchorElementResult {
 
     // 从 anchor 元素获取数据
     const anchorData = useMemo<AnchorData | null>(() => {
-        console.log(anchorElement)
         if (!anchorElement) return null
-        const result = {
+        return {
             wordKey: anchorElement.dataset.key || '',
             text: anchorElement.dataset.text || '',
             id: anchorElement.dataset.id || '',
         }
-        console.log('Anchor data:', result)
-        return result
     }, [anchorElement?.dataset.id])
 
     // 判断 anchor 是否为选区元素
