@@ -32,6 +32,19 @@ const matchWordsPositions = (text: string) => {
     return positions
 }
 
+const applyInheritedTextStyles = (element: HTMLElement) => {
+    element.style.display = 'inline'
+    element.style.verticalAlign = 'baseline'
+    element.style.font = 'inherit'
+    element.style.color = 'inherit'
+    element.style.lineHeight = 'inherit'
+    element.style.letterSpacing = 'inherit'
+    element.style.textTransform = 'inherit'
+    element.style.fontFeatureSettings = 'inherit'
+    element.style.fontVariationSettings = 'inherit'
+    element.style.setProperty('-webkit-text-fill-color', 'inherit')
+}
+
 /**
  * NodeRender 类负责在页面中查找并高亮用户收藏（starred）的单词。
  * 
@@ -163,6 +176,7 @@ class NodeRender {
                 xWordNode.dataset.text = wordNode.textContent
                 xWordNode.dataset.id = crypto.randomUUID()
                 xWordNode.style.position = 'relative'
+                applyInheritedTextStyles(xWordNode)
                 xWordNode.innerText = wordNode.textContent
 
                 // 鼠标移入单词时，显示tooltip

@@ -34,7 +34,19 @@ export default function Highlight({
   }, [settings])
 
   return (
-    <span className={clsx("inline theme-root group/word", { "dark": isDarkTheme })}>
+    <span
+      className={clsx("inline theme-root group/word", { "dark": isDarkTheme })}
+      style={{
+        font: "inherit",
+        color: "inherit",
+        lineHeight: "inherit",
+        letterSpacing: "inherit",
+        textTransform: "inherit",
+        fontFeatureSettings: "inherit",
+        fontVariationSettings: "inherit",
+        WebkitTextFillColor: "inherit"
+      }}
+    >
       <style>{styleText}</style>
       <span
         className={clsx(
@@ -52,4 +64,3 @@ export default function Highlight({
     </span>
   )
 }
-
