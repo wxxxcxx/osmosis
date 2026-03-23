@@ -62,9 +62,13 @@ const TooltipOverlay = () => {
     // 不满足显示条件时返回 null
     const showTooltip = !!(settings && anchorData?.wordKey);
     const transformOriginClass = position === 'top' ? 'origin-bottom' : 'origin-top'
-    const tooltipShadowFilter = isDarkTheme
-        ? 'drop-shadow(0 20px 40px rgba(2, 6, 23, 0.55)) drop-shadow(0 8px 18px rgba(15, 23, 42, 0.45))'
-        : 'drop-shadow(0 18px 36px rgba(15, 23, 42, 0.22)) drop-shadow(0 6px 14px rgba(15, 23, 42, 0.12))'
+    const tooltipSurfaceStyle = React.useMemo<React.CSSProperties>(() => ({
+        backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : '#ffffff',
+        border: isDarkTheme ? '1px solid rgba(248, 250, 252, 0.08)' : '1px solid rgba(15, 23, 42, 0.08)',
+        boxShadow: isDarkTheme
+            ? '0 0 0 1px rgba(248, 250, 252, 0.03), 0 0 16px rgba(248, 250, 252, 0.14), 0 16px 32px rgba(148, 163, 184, 0.14)'
+            : '0 0 0 1px rgba(15, 23, 42, 0.03), 0 16px 34px rgba(15, 23, 42, 0.16), 0 6px 16px rgba(15, 23, 42, 0.10)'
+    }), [isDarkTheme])
     const [contentHeight, setContentHeight] = React.useState<number | null>(null)
     const [contentScrollable, setContentScrollable] = React.useState(false)
     const measureRef = React.useRef<HTMLDivElement>(null)
@@ -153,11 +157,11 @@ const TooltipOverlay = () => {
                     >
                         <div
                             ref={measureRef}
+                            style={tooltipSurfaceStyle}
                             className={clsx(
                                 "p-4 rounded-lg w-[300px]",
                                 "flex flex-col relative",
-                                "bg-surface text-text-primary",
-                                "backdrop-blur-md bg-surface/90"
+                                "text-text-primary"
                             )}
                         >
                             {renderTooltipBody(false)}
@@ -172,9 +176,6 @@ const TooltipOverlay = () => {
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            style={{
-                                filter: tooltipShadowFilter
-                            }}
                             transition={{
                                 duration: 0.4,
                                 ease: [0.23, 1, 0.32, 1]
@@ -190,6 +191,7 @@ const TooltipOverlay = () => {
                                 ref={tooltipRef}
                                 initial={false}
                                 animate={contentHeight == null ? undefined : { height: contentHeight }}
+                                style={tooltipSurfaceStyle}
                                 transition={{
                                     height: {
                                         type: "spring",
@@ -201,8 +203,7 @@ const TooltipOverlay = () => {
                                     "osmosis-tooltip-container ",
                                     "p-4 rounded-lg w-[300px] max-h-[300px] overflow-hidden",
                                     "flex flex-col relative",
-                                    "bg-surface text-text-primary",
-                                    "backdrop-blur-md bg-surface/90"
+                                    "text-text-primary"
                                 )}
                             >
                                 {renderTooltipBody(contentScrollable)}

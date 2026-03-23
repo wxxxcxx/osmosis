@@ -204,7 +204,7 @@ export function useTooltipPosition(
                     transform: `translateX(calc(-50% - ${offset.x}px))`,
                     borderLeft: '6px solid transparent',
                     borderRight: '6px solid transparent',
-                    borderTop: '6px solid var(--color-bg-surface)',
+                    borderTop: '6px solid hsl(var(--bg-surface))',
                 }
             case 'bottom':
                 return {
@@ -214,7 +214,7 @@ export function useTooltipPosition(
                     transform: `translateX(calc(-50% - ${offset.x}px))`,
                     borderLeft: '6px solid transparent',
                     borderRight: '6px solid transparent',
-                    borderBottom: '6px solid var(--color-bg-surface)',
+                    borderBottom: '6px solid hsl(var(--bg-surface))',
                 }
             default:
                 return baseStyles

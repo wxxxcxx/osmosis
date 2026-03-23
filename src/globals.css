@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  .theme-root {
     /* Modern Indigo Palette - Light */
     --bg-main: 210 40% 98%;      /* #f8fafc */
     --bg-surface: 0 0% 100%;    /* #ffffff */
