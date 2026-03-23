@@ -3,7 +3,7 @@ import { Storage } from '@plasmohq/storage'
 import type { DictionaryProvider, DictionaryQueryResult, DictionaryQueryOptions } from './types'
 import { YoudaoDictionary, FreeDictionary } from './providers'
 import * as wordUtils from '~utils/word'
-import { STORAGE_KEY, defaultSettings, type Settings } from '~utils/settings'
+import { defaultSettings, readSettings } from '~utils/settings'
 
 /**
  * 词典服务
@@ -12,7 +12,7 @@ import { STORAGE_KEY, defaultSettings, type Settings } from '~utils/settings'
  */
 export class DictionaryService {
     private providers: Map<string, DictionaryProvider> = new Map()
-    private defaultProvider: string = defaultSettings.dictionaryProvider
+    private defaultProvider: string = defaultSettings.dictionary.provider
     private localStorage: Storage
     private syncStorage: Storage
 
@@ -33,9 +33,9 @@ export class DictionaryService {
      */
     private async loadDefaultProviderFromSettings(): Promise<void> {
         try {
-            const settings = await this.syncStorage.getItem<Settings>(STORAGE_KEY)
-            if (settings?.dictionaryProvider && this.providers.has(settings.dictionaryProvider)) {
-                this.defaultProvider = settings.dictionaryProvider
+            const settings = await readSettings(this.syncStorage)
+            if (this.providers.has(settings.dictionary.provider)) {
+                this.defaultProvider = settings.dictionary.provider
                 console.log(`[Dictionary] 已加载默认词典: ${this.defaultProvider}`)
             }
         } catch (error) {

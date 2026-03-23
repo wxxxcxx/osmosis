@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react"
 import {
   Settings as SettingsIcon,
   Book,
+  Database,
   Search as SearchIcon,
   Loader2,
   Trash2,
@@ -21,7 +22,15 @@ import { useStorage } from "@plasmohq/storage/hook"
 import "../globals.css"
 
 import { sendToBackground } from "@plasmohq/messaging"
-import { useSettings } from "../utils/settings"
+import {
+  dictionaryProviderOptions,
+  themeOptions,
+  useSettings,
+  vaultProviderOptions,
+  type DictionaryProviderType,
+  type Settings,
+  type VaultProviderType
+} from "../utils/settings"
 import { useQuery, useMutation } from "~hooks/use-query"
 import { useTranslation } from "~utils/i18n"
 import Detail from "~components/detail"
@@ -404,14 +413,44 @@ const QueryView: React.FC<{ initialWord?: string }> = ({ initialWord }) => {
 }
 
 const SettingsView: React.FC = () => {
-  const { t } = useTranslation(['popup', 'common'])
+  const { t } = useTranslation(['popup', 'options', 'common'])
   const [settings, setSettings] = useSettings()
 
-  const themes = [
-    { id: 'light', icon: Sun, label: 'Light' },
-    { id: 'dark', icon: Moon, label: 'Dark' },
-    { id: 'auto', icon: Monitor, label: 'Auto' },
-  ]
+  const themeIcons = {
+    light: Sun,
+    dark: Moon,
+    auto: Monitor
+  } as const
+
+  const updateTheme = (theme: Settings["basic"]["theme"]) => {
+    setSettings((prev) => ({
+      ...prev,
+      basic: {
+        ...prev.basic,
+        theme
+      }
+    }))
+  }
+
+  const updateDictionaryProvider = (provider: DictionaryProviderType) => {
+    setSettings((prev) => ({
+      ...prev,
+      dictionary: {
+        ...prev.dictionary,
+        provider
+      }
+    }))
+  }
+
+  const updateVaultProvider = (provider: VaultProviderType) => {
+    setSettings((prev) => ({
+      ...prev,
+      storage: {
+        ...prev.storage,
+        provider
+      }
+    }))
+  }
 
   const openFullOptions = () => {
     if (chrome.runtime.openOptionsPage) {
@@ -421,6 +460,14 @@ const SettingsView: React.FC = () => {
     }
   }
 
+  if (!settings) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-text-muted">
+        {t('common:loading')}
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col h-full bg-main-soft/30 overflow-y-auto custom-scrollbar">
       <div className="px-6 pt-8 pb-6">
@@ -428,24 +475,76 @@ const SettingsView: React.FC = () => {
 
         <section className="mb-8">
           <label className="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4 block">
-            Appearance
+            {t('options:groups.basic.title')}
           </label>
           <div className="flex p-1 bg-surface border border-border rounded-2xl">
-            {themes.map(({ id, icon: Icon, label }) => (
-              <button
-                key={id}
-                onClick={() => setSettings({ ...settings, theme: id as any })}
-                className={clsx(
-                  "flex items-center justify-center gap-2 flex-1 py-3 rounded-xl transition-all",
-                  settings.theme === id
-                    ? "bg-main text-white shadow-lg shadow-main/20"
-                    : "text-text-muted hover:text-text-primary hover:bg-main/5"
-                )}
-              >
-                <Icon size={18} />
-                <span className="text-xs font-semibold">{label}</span>
-              </button>
-            ))}
+            {themeOptions.map(({ value, labelKey }) => {
+              const Icon = themeIcons[value]
+
+              return (
+                <button
+                  key={value}
+                  onClick={() => updateTheme(value)}
+                  className={clsx(
+                    "flex items-center justify-center gap-2 flex-1 py-3 rounded-xl transition-all",
+                    settings.basic.theme === value
+                      ? "bg-main text-white shadow-lg shadow-main/20"
+                      : "text-text-muted hover:text-text-primary hover:bg-main/5"
+                  )}
+                >
+                  <Icon size={18} />
+                  <span className="text-xs font-semibold">{t(`options:${labelKey}`)}</span>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-4 mb-8">
+          <div className="p-5 rounded-2xl border border-border bg-surface shadow-sm">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-main/10 flex items-center justify-center text-main">
+                <Book size={20} />
+              </div>
+              <div className="flex-1">
+                <div className="font-bold text-sm">{t('options:dictionary.label')}</div>
+                <div className="text-xs text-text-muted mt-1">{t('options:dictionary.description')}</div>
+              </div>
+            </div>
+            <select
+              value={settings.dictionary.provider}
+              onChange={(e) => updateDictionaryProvider(e.target.value as DictionaryProviderType)}
+              className="w-full bg-surface border border-border text-text-primary text-sm rounded-xl focus:outline-none focus:border-main p-3"
+            >
+              {dictionaryProviderOptions.map(({ value, labelKey }) => (
+                <option key={value} value={value}>
+                  {t(`options:${labelKey}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="p-5 rounded-2xl border border-border bg-surface shadow-sm">
+            <div className="flex items-start gap-4 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-main/10 flex items-center justify-center text-main">
+                <Database size={20} />
+              </div>
+              <div className="flex-1">
+                <div className="font-bold text-sm">{t('options:vault.label')}</div>
+                <div className="text-xs text-text-muted mt-1">{t('options:vault.description')}</div>
+              </div>
+            </div>
+            <select
+              value={settings.storage.provider}
+              onChange={(e) => updateVaultProvider(e.target.value as VaultProviderType)}
+              className="w-full bg-surface border border-border text-text-primary text-sm rounded-xl focus:outline-none focus:border-main p-3"
+            >
+              {vaultProviderOptions.map(({ value, labelKey }) => (
+                <option key={value} value={value}>
+                  {t(`options:${labelKey}`)}
+                </option>
+              ))}
+            </select>
           </div>
         </section>
 
@@ -462,8 +561,8 @@ const SettingsView: React.FC = () => {
                 <SettingsIcon size={20} />
               </div>
               <div className="text-left">
-                <div className="font-bold text-sm">Preferences</div>
-                <div className="text-xs text-text-muted">Configure shortcuts and API</div>
+                <div className="font-bold text-sm">{t('advancedSettingsTitle')}</div>
+                <div className="text-xs text-text-muted">{t('advancedSettingsDescription')}</div>
               </div>
             </div>
             <ExternalLink size={16} className="text-text-muted/40 group-hover:text-main" />
@@ -487,10 +586,10 @@ function Index() {
   const [settings] = useSettings()
 
   useEffect(() => {
-    const isDark = settings.theme === "dark" ||
-      (settings.theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const isDark = settings.basic.theme === "dark" ||
+      (settings.basic.theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     document.documentElement.classList.toggle("dark", isDark);
-  }, [settings.theme])
+  }, [settings.basic.theme])
 
   const handleWordClick = (word: string) => {
     setSelectedWord(word)

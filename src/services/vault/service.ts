@@ -1,7 +1,7 @@
 import type { VaultProvider, WordItem } from "./types"
 import { SyncStorageProvider } from "./providers/sync-storage"
 import { LocalStorageProvider } from "./providers/local-storage"
-import { storage as settingsStorage, defaultSettings, type VaultProviderType, STORAGE_KEY } from "~utils/settings"
+import { storage as settingsStorage, defaultSettings, readSettings, type VaultProviderType } from "~utils/settings"
 
 /**
  * 单词本服务
@@ -16,9 +16,8 @@ export class VaultService {
      * 获取当前激活的 Provider
      */
     private async getProvider(): Promise<VaultProvider> {
-        // 读取设置
-        const settings = await settingsStorage.getItem<any>(STORAGE_KEY)
-        const type: VaultProviderType = settings?.vaultProvider || defaultSettings.vaultProvider
+        const settings = await readSettings(settingsStorage)
+        const type: VaultProviderType = settings.storage.provider || defaultSettings.storage.provider
 
         return type === "local" ? this.localProvider : this.syncProvider
     }

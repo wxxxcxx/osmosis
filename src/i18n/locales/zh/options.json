@@ -1,5 +1,28 @@
 {
     "title": "Osmosis 设置",
+    "pageDescription": "按分组管理扩展设置，让阅读和查词行为更可控。",
+    "groups": {
+        "basic": {
+            "title": "基本设置",
+            "description": "影响整个扩展的核心偏好。"
+        },
+        "appearance": {
+            "title": "外观",
+            "description": "控制主题、高亮样式和注释颜色。"
+        },
+        "behavior": {
+            "title": "行为",
+            "description": "调整阅读时的注释显示行为。"
+        },
+        "dictionary": {
+            "title": "词典",
+            "description": "选择用于查询释义的词典提供者。"
+        },
+        "storage": {
+            "title": "存储",
+            "description": "选择单词本的保存位置。"
+        }
+    },
     "showComments": {
         "label": "显示评论",
         "description": "在高亮单词上方显示第一个释义"
@@ -9,6 +32,12 @@
         "description": "选择用于查询单词释义的词典 API",
         "freeDictionary": "Free Dictionary",
         "youdao": "有道词典"
+    },
+    "vault": {
+        "label": "存储提供者",
+        "description": "选择单词本的存储位置。",
+        "sync": "Chrome 同步",
+        "local": "本地存储"
     },
     "highlightStyle": {
         "label": "高亮样式",

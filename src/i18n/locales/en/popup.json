@@ -7,5 +7,7 @@
     "tabWordBook": "Library",
     "tabSettings": "Settings",
     "historyTitle": "Recently Searched",
-    "clearHistory": "Clear"
+    "clearHistory": "Clear",
+    "advancedSettingsTitle": "All Settings",
+    "advancedSettingsDescription": "Open the full grouped settings page"
 }

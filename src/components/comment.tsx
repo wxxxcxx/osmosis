@@ -20,7 +20,7 @@ export const Comment: React.FC<CommentProps> = ({ wordKey }) => {
         return firstMeaning.definitions[0].definition
     }, [wordData])
 
-    if (!settings?.showComment || loading || !firstDefinition) {
+    if (!settings?.behavior.showComment || loading || !firstDefinition) {
         return null
     }
 
@@ -34,8 +34,8 @@ export const Comment: React.FC<CommentProps> = ({ wordKey }) => {
                 "select-none"
             )}
             style={{
-                backgroundColor: settings.commentBgColor,
-                color: settings.commentTextColor
+                backgroundColor: settings.appearance.commentBgColor,
+                color: settings.appearance.commentTextColor
             }}
         >
             <Marquee

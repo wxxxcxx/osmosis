@@ -1,5 +1,28 @@
 {
     "title": "Osmosis Settings",
+    "pageDescription": "Configure the extension by category and keep your reading workflow predictable.",
+    "groups": {
+        "basic": {
+            "title": "Basic",
+            "description": "Core preferences used across the extension."
+        },
+        "appearance": {
+            "title": "Appearance",
+            "description": "Control theme, highlights, and visual annotation colors."
+        },
+        "behavior": {
+            "title": "Behavior",
+            "description": "Choose how inline annotations behave while reading."
+        },
+        "dictionary": {
+            "title": "Dictionary",
+            "description": "Pick the provider used to fetch definitions."
+        },
+        "storage": {
+            "title": "Storage",
+            "description": "Choose where your saved words are stored."
+        }
+    },
     "showComments": {
         "label": "Show Comments",
         "description": "Display the first definition above the highlighted word."
@@ -9,6 +32,12 @@
         "description": "Choose the dictionary API for word definitions.",
         "freeDictionary": "Free Dictionary",
         "youdao": "Youdao Dictionary"
+    },
+    "vault": {
+        "label": "Storage Provider",
+        "description": "Choose where your saved words are stored.",
+        "sync": "Chrome Sync",
+        "local": "Local Storage"
     },
     "highlightStyle": {
         "label": "Highlight Style",

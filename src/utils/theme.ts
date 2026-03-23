@@ -34,8 +34,8 @@ export const useTheme = () => {
          */
         const checkDark = () => {
             if (
-                settings.theme === "dark" ||
-                (settings.theme === "auto" &&
+                settings.basic.theme === "dark" ||
+                (settings.basic.theme === "auto" &&
                     window.matchMedia("(prefers-color-scheme: dark)").matches)
             ) {
                 setIsDark(true)
@@ -52,7 +52,7 @@ export const useTheme = () => {
         mediaQuery.addEventListener("change", checkDark)
 
         return () => mediaQuery.removeEventListener("change", checkDark)
-    }, [settings?.theme])
+    }, [settings?.basic.theme])
 
     return isDark
 }

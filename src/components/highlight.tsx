@@ -17,7 +17,7 @@ export default function Highlight({
   if (!settings) return <>{text}</>
 
   const decorationClass = useMemo(() => {
-    switch (settings.highlightStyle) {
+    switch (settings.appearance.highlightStyle) {
       case "wavy":
         return "decoration-wavy"
       case "solid":
@@ -43,14 +43,13 @@ export default function Highlight({
           decorationClass,
         )}
         style={{
-          textDecorationColor: settings.highlightColor
+          textDecorationColor: settings.appearance.highlightColor
         }}
       >
         {text}
       </span>
-      {settings.showComment && <Comment wordKey={wordKey} />}
+      {settings.behavior.showComment && <Comment wordKey={wordKey} />}
     </span>
   )
 }
-
 
