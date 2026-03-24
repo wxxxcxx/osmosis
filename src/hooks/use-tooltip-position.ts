@@ -191,30 +191,25 @@ export function useTooltipPosition(
     const arrowStyles = useMemo((): React.CSSProperties => {
         const baseStyles: React.CSSProperties = {
             position: 'absolute',
-            width: 0,
-            height: 0,
+            width: '16px',
+            height: '10px',
+            pointerEvents: 'none',
         }
 
         switch (position) {
             case 'top':
                 return {
                     ...baseStyles,
-                    bottom: '-6px',
+                    bottom: '-8px',
                     left: '50%',
                     transform: `translateX(calc(-50% - ${offset.x}px))`,
-                    borderLeft: '6px solid transparent',
-                    borderRight: '6px solid transparent',
-                    borderTop: '6px solid hsl(var(--bg-surface))',
                 }
             case 'bottom':
                 return {
                     ...baseStyles,
-                    top: '-6px',
+                    top: '-8px',
                     left: '50%',
                     transform: `translateX(calc(-50% - ${offset.x}px))`,
-                    borderLeft: '6px solid transparent',
-                    borderRight: '6px solid transparent',
-                    borderBottom: '6px solid hsl(var(--bg-surface))',
                 }
             default:
                 return baseStyles

@@ -63,13 +63,19 @@ const TooltipOverlay = () => {
     // 不满足显示条件时返回 null
     const showTooltip = !!(settings && anchorData?.wordKey);
     const transformOriginClass = position === 'top' ? 'origin-bottom' : 'origin-top'
+    const tooltipFillColor = isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : '#ffffff'
+    const tooltipBorderColor = isDarkTheme ? 'rgba(248, 250, 252, 0.08)' : 'rgba(15, 23, 42, 0.08)'
+    const tooltipCardShadow = isDarkTheme
+        ? '0 0 0 1px rgba(248, 250, 252, 0.03), 0 0 16px rgba(248, 250, 252, 0.14), 0 16px 32px rgba(148, 163, 184, 0.14)'
+        : '0 0 0 1px rgba(15, 23, 42, 0.03), 0 16px 34px rgba(15, 23, 42, 0.16), 0 6px 16px rgba(15, 23, 42, 0.10)'
+    const tooltipArrowShadow = isDarkTheme
+        ? 'drop-shadow(0 10px 18px rgba(148, 163, 184, 0.16))'
+        : 'drop-shadow(0 8px 18px rgba(15, 23, 42, 0.16))'
     const tooltipSurfaceStyle = React.useMemo<React.CSSProperties>(() => ({
-        backgroundColor: isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : '#ffffff',
-        border: isDarkTheme ? '1px solid rgba(248, 250, 252, 0.08)' : '1px solid rgba(15, 23, 42, 0.08)',
-        boxShadow: isDarkTheme
-            ? '0 0 0 1px rgba(248, 250, 252, 0.03), 0 0 16px rgba(248, 250, 252, 0.14), 0 16px 32px rgba(148, 163, 184, 0.14)'
-            : '0 0 0 1px rgba(15, 23, 42, 0.03), 0 16px 34px rgba(15, 23, 42, 0.16), 0 6px 16px rgba(15, 23, 42, 0.10)'
-    }), [isDarkTheme])
+        backgroundColor: tooltipFillColor,
+        border: `1px solid ${tooltipBorderColor}`,
+        boxShadow: tooltipCardShadow
+    }), [tooltipBorderColor, tooltipCardShadow, tooltipFillColor])
     const [contentHeight, setContentHeight] = React.useState<number | null>(null)
     const [contentScrollable, setContentScrollable] = React.useState(false)
     const measureRef = React.useRef<HTMLDivElement>(null)
@@ -188,6 +194,33 @@ const TooltipOverlay = () => {
                             onMouseEnter={handleMouseEnter}
                             onMouseLeave={handleMouseLeave}
                         >
+                            <div
+                                style={arrowStyles}
+                                className="absolute z-20"
+                                aria-hidden="true"
+                            >
+                                <div
+                                    className="absolute inset-0"
+                                    style={{
+                                        backgroundColor: tooltipBorderColor,
+                                        clipPath: position === 'top'
+                                            ? 'polygon(50% 100%, 0 0, 100% 0)'
+                                            : 'polygon(50% 0, 0 100%, 100% 100%)',
+                                        filter: tooltipArrowShadow
+                                    }}
+                                ></div>
+                                <div
+                                    className="absolute"
+                                    style={{
+                                        inset: position === 'top' ? '1px 1px 0 1px' : '0 1px 1px 1px',
+                                        backgroundColor: tooltipFillColor,
+                                        clipPath: position === 'top'
+                                            ? 'polygon(50% 100%, 0 0, 100% 0)'
+                                            : 'polygon(50% 0, 0 100%, 100% 100%)'
+                                    }}
+                                ></div>
+                            </div>
+
                             <motion.div
                                 ref={tooltipRef}
                                 initial={false}
@@ -203,15 +236,12 @@ const TooltipOverlay = () => {
                                 className={clsx(
                                     "osmosis-tooltip-container ",
                                     "p-4 rounded-lg w-[300px] max-h-[300px] overflow-hidden",
-                                    "flex flex-col relative",
+                                    "flex flex-col relative z-10",
                                     "text-text-primary"
                                 )}
                             >
                                 {renderTooltipBody(contentScrollable)}
                             </motion.div>
-
-                            {/* 箭头：挂载到外层，避免高度裁剪时被截断 */}
-                            <div style={arrowStyles}></div>
                         </motion.div>
                     )}
                 </AnimatePresence>
