@@ -65,17 +65,12 @@ const TooltipOverlay = () => {
     const transformOriginClass = position === 'top' ? 'origin-bottom' : 'origin-top'
     const tooltipFillColor = isDarkTheme ? 'rgba(15, 23, 42, 0.94)' : '#ffffff'
     const tooltipBorderColor = isDarkTheme ? 'rgba(248, 250, 252, 0.08)' : 'rgba(15, 23, 42, 0.08)'
-    const tooltipCardShadow = isDarkTheme
-        ? '0 0 0 1px rgba(248, 250, 252, 0.03), 0 0 16px rgba(248, 250, 252, 0.14), 0 16px 32px rgba(148, 163, 184, 0.14)'
-        : '0 0 0 1px rgba(15, 23, 42, 0.03), 0 16px 34px rgba(15, 23, 42, 0.16), 0 6px 16px rgba(15, 23, 42, 0.10)'
-    const tooltipArrowShadow = isDarkTheme
-        ? 'drop-shadow(0 10px 18px rgba(148, 163, 184, 0.16))'
-        : 'drop-shadow(0 8px 18px rgba(15, 23, 42, 0.16))'
+    const tooltipDropShadow = isDarkTheme
+        ? `drop-shadow(0 0 0.5px ${tooltipBorderColor}) drop-shadow(0 0 16px rgba(248, 250, 252, 0.12)) drop-shadow(0 16px 32px rgba(148, 163, 184, 0.12))`
+        : `drop-shadow(0 0 0.5px ${tooltipBorderColor}) drop-shadow(0 16px 34px rgba(15, 23, 42, 0.14)) drop-shadow(0 6px 16px rgba(15, 23, 42, 0.08))`
     const tooltipSurfaceStyle = React.useMemo<React.CSSProperties>(() => ({
         backgroundColor: tooltipFillColor,
-        border: `1px solid ${tooltipBorderColor}`,
-        boxShadow: tooltipCardShadow
-    }), [tooltipBorderColor, tooltipCardShadow, tooltipFillColor])
+    }), [tooltipFillColor])
     const [contentHeight, setContentHeight] = React.useState<number | null>(null)
     const [contentScrollable, setContentScrollable] = React.useState(false)
     const measureRef = React.useRef<HTMLDivElement>(null)
@@ -187,6 +182,7 @@ const TooltipOverlay = () => {
                                 duration: 0.4,
                                 ease: [0.23, 1, 0.32, 1]
                             }}
+                            style={{ filter: tooltipDropShadow }}
                             className={clsx("pointer-events-auto", "relative", transformOriginClass)}
                             onMouseDown={preventDefault}
                             onMouseUp={stopPropagation}
@@ -196,23 +192,12 @@ const TooltipOverlay = () => {
                         >
                             <div
                                 style={arrowStyles}
-                                className="absolute z-20"
+                                className="absolute"
                                 aria-hidden="true"
                             >
                                 <div
                                     className="absolute inset-0"
                                     style={{
-                                        backgroundColor: tooltipBorderColor,
-                                        clipPath: position === 'top'
-                                            ? 'polygon(50% 100%, 0 0, 100% 0)'
-                                            : 'polygon(50% 0, 0 100%, 100% 100%)',
-                                        filter: tooltipArrowShadow
-                                    }}
-                                ></div>
-                                <div
-                                    className="absolute"
-                                    style={{
-                                        inset: position === 'top' ? '1px 1px 0 1px' : '0 1px 1px 1px',
                                         backgroundColor: tooltipFillColor,
                                         clipPath: position === 'top'
                                             ? 'polygon(50% 100%, 0 0, 100% 0)'
@@ -236,7 +221,7 @@ const TooltipOverlay = () => {
                                 className={clsx(
                                     "osmosis-tooltip-container ",
                                     "p-4 rounded-lg w-[300px] max-h-[300px] overflow-hidden",
-                                    "flex flex-col relative z-10",
+                                    "flex flex-col relative",
                                     "text-text-primary"
                                 )}
                             >
